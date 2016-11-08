@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprinklerCoreUnitTest", "Sp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprinklerTest", "SprinklerTest\SprinklerTest.csproj", "{474FC77E-A22B-478E-8D41-B615043AAE18}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "License", "License", "{72D60D11-A3D5-4FD4-836D-829ECCA9C4A9}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
