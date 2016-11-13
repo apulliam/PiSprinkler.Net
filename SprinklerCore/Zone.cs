@@ -1,5 +1,6 @@
 ﻿namespace SprinklerCore
 {
+
     public class Zone : WeeklyRange
     {
         public int ZoneId

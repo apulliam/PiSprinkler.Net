@@ -49,19 +49,19 @@ namespace SprinklerCore
             }
         }
       
-        public WateringCycle(DayOfWeek dayOfWeek, int startHour, int startMinute, int[][] zoneTimes)
+        public WateringCycle(CycleConfig cycleConfig)
         {
-            DayOfWeek = dayOfWeek;
-            StartHour = startHour;
-            StartMinute = startMinute;
+            DayOfWeek = cycleConfig.DayOfWeek;
+            StartHour = cycleConfig.StartHour;
+            StartMinute = cycleConfig.StartMinute;
             CycleId = Guid.NewGuid();
 
             StartMinuteOfWeek = ToMinuteOfWeek(DayOfWeek, StartHour, StartMinute);
 
-            for (int i = 0; i < zoneTimes.Length; i++)
+            foreach (var zoneConfig in cycleConfig.ZoneConfigs)
             {
-                var zone = new Zone(zoneTimes[i][0], StartMinuteOfWeek + CycleLength, zoneTimes[i][1]);
-                _cycleLength += zoneTimes[i][1];
+                var zone = new Zone(zoneConfig.ZoneNumber, StartMinuteOfWeek + CycleLength, zoneConfig.Time);
+                _cycleLength += zoneConfig.Time;
                 Zones.Add(zone);
             }
          

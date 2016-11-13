@@ -1,16 +1,21 @@
 ﻿using System;
+using Windows.System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using Windows.Storage;
+using Newtonsoft.Json;
 
 namespace SprinklerCore
 {
-    public class SprinklerController //: ISprinklerController
+    public class SprinklerController 
     {
         private int MaxTime = 60;
         private List<WateringCycle> _cycles = new List<WateringCycle>();
         private Dictionary<int, ZoneController> _zoneControllers = new Dictionary<int, ZoneController>();
         private bool _done = false;
+        private ThreadPoolTimer _timer = null;
 
         private Dictionary<int, int> _zoneGpioMap = new Dictionary<int, int>()
         {
@@ -24,16 +29,49 @@ namespace SprinklerCore
             { 8, 21 }
         };
 
-        private void InitializeZones()
+        private async Task ReadZoneGpioMap()
         {
+            var packageFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            var mapFile = await packageFolder.GetFileAsync("ZoneGpioMap.json");
+            String serializedMap = await FileIO.ReadTextAsync(mapFile);
+            _zoneGpioMap = JsonConvert.DeserializeObject<Dictionary<int, int>>(serializedMap);
+        }
+
+        private async Task ReadWateringCycles()
+        {
+            var localFolder =  ApplicationData.Current.LocalFolder;
+
+            var cycleFile = await localFolder.TryGetItemAsync("WateringCycles.json");
+            if (cycleFile != null)
+            {
+                var serializedCycles = await FileIO.ReadTextAsync(cycleFile as StorageFile);
+                if (serializedCycles != null)
+                    _cycles = JsonConvert.DeserializeObject<List<WateringCycle>>(serializedCycles);
+            }
+        }
+
+        private async Task WriteWateringCycles()
+        {
+            var localFolder = ApplicationData.Current.LocalFolder;
+            var cycleFile = await localFolder.CreateFileAsync("WateringCycles.json",CreationCollisionOption.ReplaceExisting);
+            var serializedCycles = JsonConvert.SerializeObject(_cycles);
+            await FileIO.WriteTextAsync(cycleFile as StorageFile, serializedCycles);
+
+        }
+
+        private async void InitializeZones()
+        {
+            await ReadZoneGpioMap();
+            //var serializedZoneMap = JsonConvert.SerializeObject(_zoneGpioMap);
             foreach (var zone in _zoneGpioMap)
             {
-                _zoneControllers[zone.Key] = new ZoneController(zone.Value);
-            }
+                _zoneControllers[zone.Key] = new MockZoneController(zone.Value);
+            };
         }
 
         public SprinklerController()
         {
+            
             InitializeZones();
         }
 
@@ -46,12 +84,12 @@ namespace SprinklerCore
             }
         }
 
-        private void ValidateZoneTimes(int[][] zoneTimes)
+        private void ValidateZoneTimes(IEnumerable<ZoneConfig> zoneTimes)
         {
-            for (int i = 0; i < zoneTimes.Length; i++)
+            foreach (var zoneTime in zoneTimes)
             {
-                ValidateZone(zoneTimes[i][0]);
-                ValidateTime(zoneTimes[i][1]);
+                ValidateZone(zoneTime.ZoneNumber);
+                ValidateTime(zoneTime.Time);
             }
         }
 
@@ -105,84 +143,119 @@ namespace SprinklerCore
             zoneController.Stop();
         }
 
-        public Guid AddWateringCycle(DayOfWeek dayOfWeek, int startHour, int startMinute, int[][] zoneTimes)
+        public Guid AddWateringCycle(CycleConfig cycleConfig)
         {
-            ValidateHour(startHour);
-            ValidateMinute(startMinute);
-            ValidateZoneTimes(zoneTimes);
+            ValidateHour(cycleConfig.StartHour);
+            ValidateMinute(cycleConfig.StartMinute);
+            ValidateZoneTimes(cycleConfig.ZoneConfigs);
             
-            var newCycle = new WateringCycle(dayOfWeek, startHour, startMinute, zoneTimes);
-
-            foreach (var cycle in _cycles)
+            var wateringCycle = new WateringCycle(cycleConfig);
+            lock (_cycles)
             {
-                if (newCycle.ConflictsWith(cycle))
-                    throw new SprinklerControllerException("Cycle overlaps with " + cycle.CycleId);
+                foreach (var cycle in _cycles)
+                {
+                    if (wateringCycle.ConflictsWith(cycle))
+                        throw new SprinklerControllerException("Cycle overlaps with " + cycle.CycleId);
+                }
+                _cycles.Add(wateringCycle);
             }
-            _cycles.Add(newCycle);
-            return newCycle.CycleId;
+            return wateringCycle.CycleId;
         }
 
 
-        public void DeleteWateringCycle(Guid cycleId)
+        public bool DeleteWateringCycle(Guid cycleId)
         {
-            var cycleToDelete = _cycles.Find(cycle => cycle.CycleId == cycleId);
-            if (cycleToDelete != null)
-                _cycles.Remove(cycleToDelete);
+            var response = false;
+            lock (_cycles)
+            {
+                var cycleToDelete = _cycles.Find(cycle => cycle.CycleId == cycleId);
+                if (cycleToDelete != null)
+                    response = _cycles.Remove(cycleToDelete);
+            }
+            return response;
         }
 
         public WateringCycle GetWateringCycle(Guid cycleId)
         {
-            return _cycles.Where(cycle => cycle.CycleId == cycleId).FirstOrDefault();
+            lock (_cycles)
+            {
+                return _cycles.Where(cycle => cycle.CycleId == cycleId).FirstOrDefault();
+            }
         }
 
         public IEnumerable<WateringCycle> GetWateringCyclesByZone(int zoneNumber)
         {
             ValidateZone(zoneNumber);
-            return _cycles.Where(cycle => cycle.Zones.Any(zone => zone.ZoneId == zoneNumber));
+            lock (_cycles)
+            {
+                return _cycles.Where(cycle => cycle.Zones.Any(zone => zone.ZoneId == zoneNumber));
+            }
         }
         
         public IEnumerable<WateringCycle> GetAllWateringCycles()
         {
-            return _cycles;
+            lock (_cycles)
+            {
+                return _cycles;
+            }
         }
 
         public void RunWateringCycles()
         {
-            while (!_done)
+           _timer = Windows.System.Threading.ThreadPoolTimer.CreateTimer(TimerCallback, TimeSpan.FromSeconds(1));
+            
+        }
+
+        private void TimerCallback(object state)
+        {
+
+            if (!_done)
             {
                 var currentTime = DateTime.Now;
-               
-                foreach (var cycle in _cycles)
+
+                lock (_cycles)
                 {
-                    if (cycle.IsRunning(currentTime))
+                    foreach (var cycle in _cycles)
                     {
-                        Debug.WriteLine("cycle " + cycle.CycleId + " is running");
-                        foreach (var zone in cycle.Zones)
+                        if (cycle.IsRunning(currentTime))
                         {
-                            if (zone.IsRunning(currentTime))
+                            Debug.WriteLine("cycle " + cycle.CycleId + " is running");
+                            foreach (var zone in cycle.Zones)
                             {
-                                Debug.WriteLine("cycle " + cycle.CycleId + " is running");
-                                _zoneControllers[zone.ZoneId].Start();
+                                if (zone.IsRunning(currentTime))
+                                {
+                                    Debug.WriteLine("cycle " + cycle.CycleId + " is running");
+                                    _zoneControllers[zone.ZoneId].Start();
+                                }
+                                else
+                                {
+                                    _zoneControllers[zone.ZoneId].Stop();
+                                }
                             }
-                            else
+                        }
+                        else
+                        {
+                            foreach (var zone in cycle.Zones)
                             {
                                 _zoneControllers[zone.ZoneId].Stop();
                             }
                         }
                     }
-                    else
-                    {
-                        foreach (var zone in cycle.Zones)
-                        {
-                            _zoneControllers[zone.ZoneId].Stop();
-                        }
-                    }
                 }
+
+                if (!_done)
+                {
+                    _timer = ThreadPoolTimer.CreateTimer(TimerCallback, TimeSpan.FromSeconds(1));
+                }
+                //await System.Threading.Tasks.Task.Delay(1000);
             }
         }
+
         public void StopWateringCycles()
         {
             _done = true;
+            if (_timer != null)
+                _timer.Cancel();
         }
 
     }

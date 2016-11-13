@@ -42,7 +42,7 @@ namespace SprinklerCore
 
         public bool IsRunning(DateTime dateTime)
         {
-            var minuteOfWeek = WateringCycle.ToMinuteOfWeek(dateTime.DayOfWeek.ToExportable(), dateTime.Hour, dateTime.Minute);
+            var minuteOfWeek = WateringCycle.ToMinuteOfWeek(dateTime.DayOfWeek, dateTime.Hour, dateTime.Minute);
             return (StartMinuteOfWeek <= minuteOfWeek && EndMinuteOfWeek >= minuteOfWeek);
         }
 

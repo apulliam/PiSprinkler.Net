@@ -48,6 +48,8 @@ namespace SprinklerTest
                 Debug.WriteLine("Zone " + zone + " isRunning = " + isRunning);
                 _sprinklerController.StartZone(zone);
                 //_sprinklerController.StopZone(zone);
+         
+
             }
         }
            

@@ -1,0 +1,15 @@
+﻿{
+  "DayOfWeek": 1,
+  "StartHour": 17,
+  "StartMinute": 0,
+  "ZoneConfigs": [
+    {
+      "ZoneNumber": 1,
+      "Time": 10
+    },
+    {
+      "ZoneNumber": 5,
+      "Time": 5
+    }
+  ]
+}

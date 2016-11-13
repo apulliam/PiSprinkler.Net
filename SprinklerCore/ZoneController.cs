@@ -1,36 +1,23 @@
 ﻿using System;
-using Windows.Devices.Gpio;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SprinklerCore
 {
-    internal class ZoneController
+    public abstract class ZoneController
     {
-        public bool IsManual { get; internal set; }
-        public GpioPin Pin { get; private set; }
-
-        internal ZoneController(int pinNumber)
+        protected ZoneController(int pinNumber)
         {
-            var gpioController = GpioController.GetDefault();
-            var pin = gpioController.OpenPin(pinNumber);
-            pin.SetDriveMode(GpioPinDriveMode.Output);
-            Pin = pin;
         }
+        public abstract bool IsManual { get; internal set; }
 
-        public void Start()
-        {
-            if (Pin.Read() == GpioPinValue.High)
-                Pin.Write(GpioPinValue.Low);
-        }
+        public abstract void Start();
 
-        public void Stop()
-        {
-            if (Pin.Read() == GpioPinValue.High)
-                Pin.Write(GpioPinValue.Low);
-        }
+        public abstract void Stop();
 
-        public bool IsRunning()
-        {
-            return (Pin.Read() == GpioPinValue.High);
-        }
+        public abstract bool IsRunning();
     }
+
 }

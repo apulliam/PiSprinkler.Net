@@ -5,14 +5,16 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprinklerCore", "SprinklerCore\SprinklerCore.csproj", "{6ACD99AF-5E7D-4DDF-ABAD-9B292F53D91F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprinklerCoreUnitTest", "SprinklerCoreUnitTest\SprinklerCoreUnitTest.csproj", "{BBCBDA06-9710-4A11-B5EA-6E1A60DF115C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprinklerTest", "SprinklerTest\SprinklerTest.csproj", "{474FC77E-A22B-478E-8D41-B615043AAE18}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "License", "License", "{72D60D11-A3D5-4FD4-836D-829ECCA9C4A9}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE = LICENSE
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiSprinkler", "PiSprinkler\PiSprinkler.csproj", "{E5700E72-028A-4F75-A144-D2838B9813D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprinklerCoreUnitTest", "SprinklerCoreUnitTest\SprinklerCoreUnitTest.csproj", "{BBCBDA06-9710-4A11-B5EA-6E1A60DF115C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprinklerTest", "SprinklerTest\SprinklerTest.csproj", "{474FC77E-A22B-478E-8D41-B615043AAE18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,26 @@ Global
 		{6ACD99AF-5E7D-4DDF-ABAD-9B292F53D91F}.Release|x64.Build.0 = Release|x64
 		{6ACD99AF-5E7D-4DDF-ABAD-9B292F53D91F}.Release|x86.ActiveCfg = Release|x86
 		{6ACD99AF-5E7D-4DDF-ABAD-9B292F53D91F}.Release|x86.Build.0 = Release|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|ARM.ActiveCfg = Debug|ARM
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|ARM.Build.0 = Debug|ARM
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|ARM.Deploy.0 = Debug|ARM
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|x64.ActiveCfg = Debug|x64
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|x64.Build.0 = Debug|x64
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|x64.Deploy.0 = Debug|x64
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|x86.ActiveCfg = Debug|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|x86.Build.0 = Debug|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Debug|x86.Deploy.0 = Debug|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|Any CPU.ActiveCfg = Release|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|ARM.ActiveCfg = Release|ARM
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|ARM.Build.0 = Release|ARM
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|ARM.Deploy.0 = Release|ARM
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|x64.ActiveCfg = Release|x64
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|x64.Build.0 = Release|x64
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|x64.Deploy.0 = Release|x64
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|x86.ActiveCfg = Release|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|x86.Build.0 = Release|x86
+		{E5700E72-028A-4F75-A144-D2838B9813D7}.Release|x86.Deploy.0 = Release|x86
 		{BBCBDA06-9710-4A11-B5EA-6E1A60DF115C}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{BBCBDA06-9710-4A11-B5EA-6E1A60DF115C}.Debug|ARM.ActiveCfg = Debug|ARM
 		{BBCBDA06-9710-4A11-B5EA-6E1A60DF115C}.Debug|ARM.Build.0 = Debug|ARM
