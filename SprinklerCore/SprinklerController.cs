@@ -17,21 +17,17 @@ namespace SprinklerCore
         private bool _done = false;
         private ThreadPoolTimer _timer = null;
 
-        private Dictionary<int, int> _zoneGpioMap = new Dictionary<int, int>();
-      
-
-        private async Task ReadZoneGpioMap()
+        private async void ReadZoneConfig()
         {
             var packageFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-            var mapFile = await packageFolder.GetFileAsync("ZoneGpioMap.json");
-            String serializedMap = await FileIO.ReadTextAsync(mapFile);
-            _zoneGpioMap = JsonConvert.DeserializeObject<Dictionary<int, int>>(serializedMap);
+            var zoneFile = await packageFolder.GetFileAsync("ZoneConfig.json");
+            String serializedZones = await FileIO.ReadTextAsync(zoneFile);
+            _zoneControllers = JsonConvert.DeserializeObject<Dictionary<int,ZoneController>>(serializedZones);
         }
 
         private async void ReadWateringCycles()
         {
             var localFolder =  ApplicationData.Current.LocalFolder;
-
             var cycleFile = await localFolder.TryGetItemAsync("WateringCycles.json");
             if (cycleFile != null)
             {
@@ -47,27 +43,17 @@ namespace SprinklerCore
             var cycleFile = await localFolder.CreateFileAsync("WateringCycles.json",CreationCollisionOption.ReplaceExisting);
             var serializedCycles = JsonConvert.SerializeObject(_cycles);
             await FileIO.WriteTextAsync(cycleFile as StorageFile, serializedCycles);
-
-        }
-
-        private async void InitializeZones()
-        {
-            await ReadZoneGpioMap();
-            foreach (var zone in _zoneGpioMap)
-            {
-                _zoneControllers[zone.Key] = new MockZoneController(zone.Value);
-            };
         }
 
         public SprinklerController()
         {
-            InitializeZones();
+            ReadZoneConfig();
             ReadWateringCycles();
         }
 
         private void ValidateZone(int zone)
         {
-            if (!_zoneGpioMap.ContainsKey(zone))
+            if (!_zoneControllers.ContainsKey(zone))
             {
                 var validZones = _zoneControllers.Keys.ToArray().ToString();
                 throw new SprinklerControllerException("Zone must be " + validZones);
@@ -76,6 +62,9 @@ namespace SprinklerCore
 
         private void ValidateZoneTimes(IEnumerable<ZoneConfig> zoneTimes)
         {
+            var distinct = zoneTimes.Distinct();
+            if (distinct.Count() != zoneTimes.Count())
+                throw new SprinklerControllerException("A zone can only be run once in each cylce");
             foreach (var zoneTime in zoneTimes)
             {
                 ValidateZone(zoneTime.ZoneNumber);
@@ -101,12 +90,16 @@ namespace SprinklerCore
                 throw new SprinklerControllerException("Minute must be 0-59");
         }
 
-        public IEnumerable<int> Zones
+        public IEnumerable<ZoneController> GetAllZones()
         {
-            get
-            {
-                return _zoneGpioMap.Keys;
-            }
+            return _zoneControllers.Values;
+        }
+
+        public ZoneController GetZone(int zoneNumber)
+        {
+            ZoneController zoneController = null;
+            _zoneControllers.TryGetValue(zoneNumber, out zoneController);
+            return zoneController;
         }
 
         public bool IsZoneRunning(int zoneNumber)
@@ -115,7 +108,6 @@ namespace SprinklerCore
             var zoneController = _zoneControllers[zoneNumber];
             return zoneController.IsRunning();
         }
-
 
         public void StartZone(int zoneNumber)
         {
@@ -153,7 +145,6 @@ namespace SprinklerCore
             return wateringCycle.CycleId;
         }
 
-
         public bool DeleteWateringCycle(Guid cycleId)
         {
             var response = false;
@@ -185,7 +176,7 @@ namespace SprinklerCore
                 return _cycles.Where(cycle => cycle.CycleId == cycleId).FirstOrDefault();
             }
         }
-
+        
         public IEnumerable<WateringCycle> GetWateringCyclesByZone(int zoneNumber)
         {
             ValidateZone(zoneNumber);

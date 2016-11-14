@@ -17,7 +17,6 @@ namespace PiSprinkler
     {
         private static SprinklerController _sprinklerController;
         private HttpServer _httpServer;
-
         private BackgroundTaskDeferral _deferral;
 
         internal static SprinklerController SprinklerController
@@ -27,7 +26,6 @@ namespace PiSprinkler
                 return _sprinklerController;
             }
         }
-    
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {

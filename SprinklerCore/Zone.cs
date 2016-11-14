@@ -2,7 +2,6 @@
 
 namespace SprinklerCore
 {
-
     public class Zone : WeeklyRange
     {
         public int ZoneId
@@ -10,30 +9,26 @@ namespace SprinklerCore
             get;
             private set;
         }
-
        
-
         internal Zone(int zoneId, int startMinuteOfWeek, int runTime)
         {
             ZoneId = zoneId;
             RunTime = runTime;
 
-            var endMinuteOfWeek = startMinuteOfWeek + RunTime;
             if (startMinuteOfWeek >= 10080)
             {
                 StartMinuteOfWeek = startMinuteOfWeek - 10080;
-
             }
             else
                 StartMinuteOfWeek = startMinuteOfWeek;
+
+            var endMinuteOfWeek = startMinuteOfWeek + RunTime;
             if (endMinuteOfWeek >= 10080)
             {
                 EndMinuteOfWeek = endMinuteOfWeek - 10080;
             }
             else
                 EndMinuteOfWeek = endMinuteOfWeek;
-
-            
         }
 
         internal Zone()

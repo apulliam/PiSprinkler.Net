@@ -10,7 +10,6 @@ using SprinklerCore;
 
 namespace PiSprinkler
 {
-
     [RestController(InstanceCreationType.PerCall)]
     public sealed class Sprinkler
     {
@@ -37,7 +36,6 @@ namespace PiSprinkler
                 StartupTask.SprinklerController.GetWateringCycle(Guid.Parse(id)));
         }
 
-
         [UriFormat("/cycles/zones/{zoneNumber}")]
         public IGetResponse GetWateringCyclesByZone(string zoneNumber)
         {
@@ -63,6 +61,14 @@ namespace PiSprinkler
             var cycleId = StartupTask.SprinklerController.AddWateringCycle(cycle.ToInternal());
             return new PostResponse(PostResponse.ResponseStatus.Created, $"{cycleId}");
         }
+
+        //[UriFormat("/zones")]
+        //public IGetResponse GetZones()
+        //{
+        //    return new GetResponse(
+        //        GetResponse.ResponseStatus.OK,
+        //        StartupTask.SprinklerController.GetAllWateringCycles());
+        //}
 
         [UriFormat("/zones/{id}/start")]
         public IPutResponse StartZone(string id)

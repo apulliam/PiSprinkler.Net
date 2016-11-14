@@ -95,6 +95,9 @@
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="PiSprinklerTest.json" />
     <None Include="project.json" />
+    <Content Include="ZoneConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CycleConfig.cs" />
@@ -133,9 +136,6 @@
     </Content>
     <Content Include="Assets\Wide310x150Logo.scale-200.png">
       <InProject>false</InProject>
-    </Content>
-    <Content Include="ZoneGpioMap.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
