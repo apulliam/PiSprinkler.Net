@@ -42,11 +42,12 @@ namespace SprinklerTest
 
         private void DebuggerTest()
         {
-            foreach (var zone in _sprinklerController.Zones)
+            var zones = _sprinklerController.GetAllZones();
+            foreach (var zone in zones)
             {
-                var isRunning = _sprinklerController.IsZoneRunning(zone);
+                var isRunning = _sprinklerController.IsZoneRunning(zone.ZoneNumber);
                 Debug.WriteLine("Zone " + zone + " isRunning = " + isRunning);
-                _sprinklerController.StartZone(zone);
+                _sprinklerController.StartZone(zone.ZoneNumber);
                 //_sprinklerController.StopZone(zone);
          
 
