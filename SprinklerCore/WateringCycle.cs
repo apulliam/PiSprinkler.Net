@@ -1,16 +1,27 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 
 namespace SprinklerCore
 {
     public class WateringCycle : WeeklyRange
     {
+       
         public Guid CycleId
         {
             get;
             private set;
         }
 
+        public string Name
+        {
+            get;
+            private set;
+        }
+
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public DayOfWeek DayOfWeek
         {
             get;
@@ -39,57 +50,49 @@ namespace SprinklerCore
             }
         }
 
-        private int _cycleLength = 0;
-
-        public int CycleLength
+            
+        internal WateringCycle(CycleConfig cycleConfig)
         {
-            get
-            {
-                return _cycleLength;
-            }
-        }
-      
-        public WateringCycle(CycleConfig cycleConfig)
-        {
+            Name = cycleConfig.Name;
             DayOfWeek = cycleConfig.DayOfWeek;
             StartHour = cycleConfig.StartHour;
             StartMinute = cycleConfig.StartMinute;
             CycleId = Guid.NewGuid();
 
-            StartMinuteOfWeek = ToMinuteOfWeek(DayOfWeek, StartHour, StartMinute);
+           StartMinuteOfWeek = ToMinuteOfWeek(DayOfWeek, StartHour, StartMinute);
 
+            var runTime = 0;
             foreach (var zoneConfig in cycleConfig.ZoneConfigs)
             {
-                var zone = new Zone(zoneConfig.ZoneNumber, StartMinuteOfWeek + CycleLength, zoneConfig.Time);
-                _cycleLength += zoneConfig.Time;
+                var zone = new Zone(zoneConfig.ZoneNumber, StartMinuteOfWeek + runTime, zoneConfig.Time);
+                runTime += zoneConfig.Time;
                 Zones.Add(zone);
             }
-         
-            EndMinuteOfWeek = StartMinuteOfWeek + CycleLength;
-          
+            RunTime = runTime;
+            var endMinuteOfWeek = StartMinuteOfWeek + RunTime;
+            if (endMinuteOfWeek >= 10080)
+            {
+                EndMinuteOfWeek = endMinuteOfWeek - 10080;
+            }
+            else
+                EndMinuteOfWeek = endMinuteOfWeek;
         }
 
-        private bool RangeOverlaps(int x1, int x2, int y1, int y2)
+        [JsonConstructor]
+        internal WateringCycle(Guid CycleId, string Name, DayOfWeek DayOfWeek, int StartHour, int StartMinute, IEnumerable<Zone> Zones, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
         {
-            return (x1 <= y2 && y1 <= x2);
+            this.CycleId = CycleId;
+            this.Name = Name;
+            this.DayOfWeek = DayOfWeek;
+            this.StartHour = StartHour;
+            this.StartMinute = StartMinute;
+            this.StartMinuteOfWeek = StartMinuteOfWeek;
+            this.EndMinuteOfWeek = EndMinuteOfWeek;
+            this.RunTime = RunTime;
+            foreach (var zone in Zones)
+                _zones.Add(zone);
         }
 
-        internal bool ConflictsWith(WateringCycle cycle)
-        {
-            if (RangeOverlaps(StartMinuteOfWeek, EndMinuteOfWeek, cycle.StartMinuteOfWeek, cycle.EndMinuteOfWeek))
-                return true;
-            if (RangeOverlaps(StartMinuteOfWeek, EndMinuteOfWeek, 0, cycle.OverlapMinuteOfWeek))
-                return true;
-            if (RangeOverlaps(0, OverlapMinuteOfWeek, cycle.StartMinuteOfWeek, cycle.EndMinuteOfWeek))
-                return true;
-            if (OverlapMinuteOfWeek > 0 && cycle.OverlapMinuteOfWeek > 0)
-                return true;
-            return false;
-        }
-
-        internal static int ToMinuteOfWeek(DayOfWeek dayOfWeek, int startHour, int startMinute)
-        {
-            return ((int)dayOfWeek * 24 * 60) + (startHour * 60) + startMinute;
-        }
+       
     }
 }

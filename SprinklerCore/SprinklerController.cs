@@ -17,17 +17,8 @@ namespace SprinklerCore
         private bool _done = false;
         private ThreadPoolTimer _timer = null;
 
-        private Dictionary<int, int> _zoneGpioMap = new Dictionary<int, int>()
-        {
-            { 1, 18 },
-            { 2, 23 },
-            { 3, 24 },
-            { 4, 25 },
-            { 5, 12 },
-            { 6, 16 },
-            { 7, 20 },
-            { 8, 21 }
-        };
+        private Dictionary<int, int> _zoneGpioMap = new Dictionary<int, int>();
+      
 
         private async Task ReadZoneGpioMap()
         {
@@ -37,7 +28,7 @@ namespace SprinklerCore
             _zoneGpioMap = JsonConvert.DeserializeObject<Dictionary<int, int>>(serializedMap);
         }
 
-        private async Task ReadWateringCycles()
+        private async void ReadWateringCycles()
         {
             var localFolder =  ApplicationData.Current.LocalFolder;
 
@@ -50,7 +41,7 @@ namespace SprinklerCore
             }
         }
 
-        private async Task WriteWateringCycles()
+        private async void WriteWateringCycles()
         {
             var localFolder = ApplicationData.Current.LocalFolder;
             var cycleFile = await localFolder.CreateFileAsync("WateringCycles.json",CreationCollisionOption.ReplaceExisting);
@@ -62,7 +53,6 @@ namespace SprinklerCore
         private async void InitializeZones()
         {
             await ReadZoneGpioMap();
-            //var serializedZoneMap = JsonConvert.SerializeObject(_zoneGpioMap);
             foreach (var zone in _zoneGpioMap)
             {
                 _zoneControllers[zone.Key] = new MockZoneController(zone.Value);
@@ -71,8 +61,8 @@ namespace SprinklerCore
 
         public SprinklerController()
         {
-            
             InitializeZones();
+            ReadWateringCycles();
         }
 
         private void ValidateZone(int zone)
@@ -158,6 +148,7 @@ namespace SprinklerCore
                         throw new SprinklerControllerException("Cycle overlaps with " + cycle.CycleId);
                 }
                 _cycles.Add(wateringCycle);
+                WriteWateringCycles();
             }
             return wateringCycle.CycleId;
         }
@@ -170,9 +161,21 @@ namespace SprinklerCore
             {
                 var cycleToDelete = _cycles.Find(cycle => cycle.CycleId == cycleId);
                 if (cycleToDelete != null)
+                {
                     response = _cycles.Remove(cycleToDelete);
+                    WriteWateringCycles();
+                }
             }
             return response;
+        }
+
+        public void ClearWateringCycles()
+        {
+            lock (_cycles)
+            {
+                _cycles.Clear();
+                WriteWateringCycles();
+            }
         }
 
         public WateringCycle GetWateringCycle(Guid cycleId)
@@ -202,7 +205,7 @@ namespace SprinklerCore
 
         public void RunWateringCycles()
         {
-           _timer = Windows.System.Threading.ThreadPoolTimer.CreateTimer(TimerCallback, TimeSpan.FromSeconds(1));
+           _timer = ThreadPoolTimer.CreateTimer(TimerCallback, TimeSpan.FromSeconds(1));
             
         }
 
@@ -224,12 +227,20 @@ namespace SprinklerCore
                             {
                                 if (zone.IsRunning(currentTime))
                                 {
-                                    Debug.WriteLine("cycle " + cycle.CycleId + " is running");
+                                    Debug.WriteLine("zone " + zone.ZoneId + " is running");
                                     _zoneControllers[zone.ZoneId].Start();
                                 }
                                 else
                                 {
-                                    _zoneControllers[zone.ZoneId].Stop();
+                                    if (!_zoneControllers[zone.ZoneId].IsManual)
+                                    {
+
+                                        _zoneControllers[zone.ZoneId].Stop();
+                                    }
+                                    else
+                                    {
+                                        Debug.WriteLine("zone " + zone.ZoneId + " is manual mode");
+                                    }
                                 }
                             }
                         }

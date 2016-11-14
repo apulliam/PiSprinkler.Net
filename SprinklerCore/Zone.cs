@@ -1,4 +1,6 @@
-﻿namespace SprinklerCore
+﻿using Newtonsoft.Json;
+
+namespace SprinklerCore
 {
 
     public class Zone : WeeklyRange
@@ -9,18 +11,43 @@
             private set;
         }
 
-        public int RunTime
-        {
-            get;
-            set;
-        }
+       
 
-        internal Zone(int zoneId, int startMinuteOfMonth, int runTime)
+        internal Zone(int zoneId, int startMinuteOfWeek, int runTime)
         {
             ZoneId = zoneId;
             RunTime = runTime;
-            StartMinuteOfWeek = startMinuteOfMonth;
-            EndMinuteOfWeek = StartMinuteOfWeek + RunTime;
+
+            var endMinuteOfWeek = startMinuteOfWeek + RunTime;
+            if (startMinuteOfWeek >= 10080)
+            {
+                StartMinuteOfWeek = startMinuteOfWeek - 10080;
+
+            }
+            else
+                StartMinuteOfWeek = startMinuteOfWeek;
+            if (endMinuteOfWeek >= 10080)
+            {
+                EndMinuteOfWeek = endMinuteOfWeek - 10080;
+            }
+            else
+                EndMinuteOfWeek = endMinuteOfWeek;
+
+            
+        }
+
+        internal Zone()
+        {
+        }
+
+        [JsonConstructor]
+        internal Zone(int ZoneId, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
+        {
+            this.ZoneId = ZoneId;
+            this.RunTime = RunTime;
+            this.StartMinuteOfWeek = StartMinuteOfWeek;
+            this.EndMinuteOfWeek = EndMinuteOfWeek;
+            
         }
     }
 }

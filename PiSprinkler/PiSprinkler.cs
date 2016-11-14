@@ -22,6 +22,13 @@ namespace PiSprinkler
                 StartupTask.SprinklerController.GetAllWateringCycles());
         }
 
+        [UriFormat("/cycles")]
+        public IDeleteResponse ClearWateringCycles()
+        {
+            StartupTask.SprinklerController.ClearWateringCycles();
+            return new DeleteResponse(DeleteResponse.ResponseStatus.OK);
+        }
+
         [UriFormat("/cycles/{id}")]
         public IGetResponse GetAllWateringCycle(string id)
         {

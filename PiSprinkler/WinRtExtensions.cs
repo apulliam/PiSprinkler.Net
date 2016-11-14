@@ -14,6 +14,7 @@ namespace PiSprinkler
         {
             var internalCycleConfig = new SprinklerCore.CycleConfig()
             {
+                Name = cycleConfig.Name,
                 DayOfWeek = cycleConfig.DayOfWeek.ToInternal(),
                 StartHour = cycleConfig.StartHour,
                 StartMinute = cycleConfig.StartMinute

@@ -8,6 +8,12 @@ namespace SprinklerCore
 {
     public class CycleConfig
     {
+        public string Name
+        {
+            get;
+            set;
+        }
+
         public DayOfWeek DayOfWeek
         {
             get;
