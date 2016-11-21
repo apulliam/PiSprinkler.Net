@@ -18,11 +18,11 @@ namespace SprinklerCore
             this.Name = Name;
             this.PinNumber = PinNumber;
 
-            if (ApiInformation.IsTypePresent("Windows.Devices.Gpio"))
-            {
-                var gpioController = GpioController.GetDefault();
-                var pin = gpioController.OpenPin(this.PinNumber);
-                pin.SetDriveMode(GpioPinDriveMode.Output);
+            var gpioController = GpioController.GetDefault();
+            if (gpioController != null)
+            { 
+                Pin = gpioController.OpenPin(this.PinNumber);
+                Pin.SetDriveMode(GpioPinDriveMode.Output);
             }
         }
         public int ZoneNumber { get; protected set;  }
@@ -39,8 +39,8 @@ namespace SprinklerCore
 
         public void Start()
         {
-            if (ApiInformation.IsTypePresent("Windows.Devices.Gpio"))
-            {
+           if (Pin != null)
+            { 
                 if (Pin.Read() == GpioPinValue.High)
                     Pin.Write(GpioPinValue.Low);
             }
@@ -51,7 +51,7 @@ namespace SprinklerCore
         public void Stop()
         {
             IsManual = false;
-            if (ApiInformation.IsTypePresent("Windows.Devices.Gpio"))
+            if (Pin != null)
             {
                 if (Pin.Read() == GpioPinValue.High)
                     Pin.Write(GpioPinValue.Low);
@@ -62,7 +62,7 @@ namespace SprinklerCore
 
         public bool IsRunning()
         {
-            if (ApiInformation.IsTypePresent("Windows.Devices.Gpio"))
+            if (Pin != null)
             {
                 return (Pin.Read() == GpioPinValue.High);
             }

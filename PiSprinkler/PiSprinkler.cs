@@ -62,13 +62,13 @@ namespace PiSprinkler
             return new PostResponse(PostResponse.ResponseStatus.Created, $"{cycleId}");
         }
 
-        //[UriFormat("/zones")]
-        //public IGetResponse GetZones()
-        //{
-        //    return new GetResponse(
-        //        GetResponse.ResponseStatus.OK,
-        //        StartupTask.SprinklerController.GetAllWateringCycles());
-        //}
+        [UriFormat("/zones")]
+        public IGetResponse GetZones()
+        {
+            return new GetResponse(
+                GetResponse.ResponseStatus.OK,
+                StartupTask.SprinklerController.GetAllZones());
+        }
 
         [UriFormat("/zones/{id}/start")]
         public IPutResponse StartZone(string id)

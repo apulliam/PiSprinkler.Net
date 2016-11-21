@@ -218,7 +218,7 @@ namespace SprinklerCore
                             {
                                 if (zone.IsRunning(currentTime))
                                 {
-                                    Debug.WriteLine("zone " + zone.ZoneId + " is running");
+                                    Debug.WriteLine("Current time is " + currentTime.TimeOfDay + " zone " + zone.ZoneId + " is running.");
                                     _zoneControllers[zone.ZoneId].Start();
                                 }
                                 else

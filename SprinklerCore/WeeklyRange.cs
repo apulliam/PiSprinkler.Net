@@ -56,9 +56,9 @@ namespace SprinklerCore
             bool isRunning = false;
             var minuteOfWeek = ToMinuteOfWeek(dateTime.DayOfWeek, dateTime.Hour, dateTime.Minute);
             if (EndMinuteOfWeek > StartMinuteOfWeek)
-                isRunning = (StartMinuteOfWeek <= minuteOfWeek && EndMinuteOfWeek >= minuteOfWeek);
+                isRunning = (StartMinuteOfWeek <= minuteOfWeek && EndMinuteOfWeek > minuteOfWeek);
             else
-                isRunning = ((minuteOfWeek >= StartMinuteOfWeek) || (minuteOfWeek <= EndMinuteOfWeek));
+                isRunning = ((minuteOfWeek >= StartMinuteOfWeek) || (minuteOfWeek < EndMinuteOfWeek));
             return isRunning;
         }
 
