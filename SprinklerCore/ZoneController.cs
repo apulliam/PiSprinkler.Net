@@ -39,7 +39,8 @@ namespace SprinklerCore
 
         public void Start()
         {
-           if (Pin != null)
+           
+            if (Pin != null)
             { 
                 if (Pin.Read() == GpioPinValue.High)
                     Pin.Write(GpioPinValue.Low);

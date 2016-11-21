@@ -70,6 +70,15 @@ namespace PiSprinkler
                 StartupTask.SprinklerController.GetAllZones());
         }
 
+
+        [UriFormat("/zones/{id}")]
+        public IGetResponse GetZone(string id)
+        {
+            return new GetResponse(
+                GetResponse.ResponseStatus.OK,
+                StartupTask.SprinklerController.GetZone(int.Parse(id)));
+        }
+
         [UriFormat("/zones/{id}/start")]
         public IPutResponse StartZone(string id)
         {

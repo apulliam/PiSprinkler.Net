@@ -122,7 +122,8 @@ namespace SprinklerCore
             ValidateZone(zoneNumber);
             var zoneController = _zoneControllers[zoneNumber];
             zoneController.IsManual = false;
-            zoneController.Stop();
+            // No need to stop manually - scheduler will stop
+            //zoneController.Stop();
         }
 
         public Guid AddWateringCycle(CycleConfig cycleConfig)
@@ -209,38 +210,32 @@ namespace SprinklerCore
 
                 lock (_cycles)
                 {
-                    foreach (var cycle in _cycles)
+                    IEnumerable<ZoneController> nonRunningZones = null;
+                    var runningCycle = _cycles.Where(cycle => cycle.IsRunning(currentTime)).FirstOrDefault();
+                    if (runningCycle != null)
                     {
-                        if (cycle.IsRunning(currentTime))
+                        Debug.WriteLine("cycle " + runningCycle.CycleId + " is running");
+                        var runningZone = runningCycle.Zones.Where(zone => zone.IsRunning(currentTime)).FirstOrDefault();
+                        if (runningZone != null)
                         {
-                            Debug.WriteLine("cycle " + cycle.CycleId + " is running");
-                            foreach (var zone in cycle.Zones)
-                            {
-                                if (zone.IsRunning(currentTime))
-                                {
-                                    Debug.WriteLine("Current time is " + currentTime.TimeOfDay + " zone " + zone.ZoneId + " is running.");
-                                    _zoneControllers[zone.ZoneId].Start();
-                                }
-                                else
-                                {
-                                    if (!_zoneControllers[zone.ZoneId].IsManual)
-                                    {
+                            Debug.WriteLine("Current time is " + currentTime.TimeOfDay + " zone " + runningZone.ZoneId + " is running.");
+                            _zoneControllers[runningZone.ZoneId].Start();
+                        }
+                        nonRunningZones = _zoneControllers.Where(zoneController => zoneController.Key != runningZone.ZoneId).Select(zoneController => zoneController.Value);
+                    }
+                    else
+                        nonRunningZones = _zoneControllers.Select(zoneController => zoneController.Value);
+                    
+                    foreach (var zone in nonRunningZones)
+                    { 
+                        if (!_zoneControllers[zone.ZoneNumber].IsManual)
+                        {
 
-                                        _zoneControllers[zone.ZoneId].Stop();
-                                    }
-                                    else
-                                    {
-                                        Debug.WriteLine("zone " + zone.ZoneId + " is manual mode");
-                                    }
-                                }
-                            }
+                            _zoneControllers[zone.ZoneNumber].Stop();
                         }
                         else
                         {
-                            foreach (var zone in cycle.Zones)
-                            {
-                                _zoneControllers[zone.ZoneId].Stop();
-                            }
+                            Debug.WriteLine("zone " + zone.ZoneNumber + " is manual mode");
                         }
                     }
                 }
