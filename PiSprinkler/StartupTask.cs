@@ -39,7 +39,7 @@ namespace PiSprinkler
             restRouteHandler.RegisterController<Sprinkler>();
             
             var configuration = new HttpServerConfiguration()
-                .ListenOnPort(8000)
+                .ListenOnPort(80)
                 .RegisterRoute("api",restRouteHandler);
      
             var httpServer = new HttpServer(configuration);

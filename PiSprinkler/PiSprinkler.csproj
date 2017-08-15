@@ -139,14 +139,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\restup\src\Webserver.Models\Webserver.Models.csproj">
-      <Project>{0b20d095-2896-41a6-865d-172dfd5ecc99}</Project>
-      <Name>Webserver.Models</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\restup\src\WebServer\WebServer.csproj">
-      <Project>{837b8ff3-ded6-4dc7-ad58-dbb0b3e44dd4}</Project>
-      <Name>WebServer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SprinklerCore\SprinklerCore.csproj">
       <Project>{6acd99af-5e7d-4ddf-abad-9b292f53d91f}</Project>
       <Name>SprinklerCore</Name>

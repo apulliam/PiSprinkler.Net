@@ -1,34 +1,43 @@
 ﻿{
   "1": {
     "ZoneNumber": 1,
-    "PinNumber": 18
+    "Name": "front yard",
+    "PinNumber": 21
+    
   },
   "2": {
     "ZoneNumber": 2,
-    "PinNumber": 23
+    "Name": "unused",
+    "PinNumber": 20
   },
   "3": {
     "ZoneNumber": 3,
-    "PinNumber": 24
+    "Name": "front of house, east side inside fence",
+    "PinNumber": 16
   },
   "4": {
     "ZoneNumber": 4,
-    "PinNumber": 25
+    "Name": "front of house, end of driveway",
+    "PinNumber": 12
   },
   "5": {
     "ZoneNumber": 5,
-    "PinNumber": 12
+    "Name": "driveway side",
+    "PinNumber": 25
   },
   "6": {
     "ZoneNumber": 6,
-    "PinNumber": 16
+    "Name": "west side of house",
+    "PinNumber": 24
   },
   "7": {
     "ZoneNumber": 7,
-    "PinNumber": 20
+    "Name": "east side of house",
+    "PinNumber": 23
   },
   "8": {
     "ZoneNumber": 8,
-    "PinNumber": 21
+    "Name": "backyard",
+    "PinNumber": 18
   }
 }

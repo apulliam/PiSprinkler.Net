@@ -106,12 +106,14 @@ namespace SprinklerCore
         {
             ValidateZone(zoneNumber);
             var zoneController = _zoneControllers[zoneNumber];
-            return zoneController.IsRunning();
+            return zoneController.IsRunning;
         }
 
         public void StartZone(int zoneNumber)
         {
             ValidateZone(zoneNumber);
+            // turn off other zones first
+            //_zoneControllers.ToList().Select(z => z.Value.IsManual = false);
             var zoneController = _zoneControllers[zoneNumber];
             zoneController.IsManual = true;
             zoneController.Start();

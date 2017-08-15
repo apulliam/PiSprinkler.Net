@@ -11,6 +11,9 @@ namespace SprinklerCore
 {
     public class ZoneController
     {
+        private static GpioPinValue ZoneOff = GpioPinValue.High;
+        private static GpioPinValue ZoneOn = GpioPinValue.Low;
+
         [JsonConstructor]
         protected ZoneController(int ZoneNumber, string Name, int PinNumber)
         {
@@ -42,8 +45,9 @@ namespace SprinklerCore
            
             if (Pin != null)
             { 
-                if (Pin.Read() == GpioPinValue.High)
-                    Pin.Write(GpioPinValue.Low);
+                var state = Pin.Read();
+                if (state == ZoneOff)
+                    Pin.Write(ZoneOn);
             }
             else
                 _isRunning = true;
@@ -54,21 +58,24 @@ namespace SprinklerCore
             IsManual = false;
             if (Pin != null)
             {
-                if (Pin.Read() == GpioPinValue.High)
-                    Pin.Write(GpioPinValue.Low);
+                if (Pin.Read() == ZoneOn)
+                    Pin.Write(ZoneOff);
             }
             else
                 _isRunning = false;
         }
 
-        public bool IsRunning()
+        public bool IsRunning
         {
-            if (Pin != null)
+            get
             {
-                return (Pin.Read() == GpioPinValue.High);
+                if (Pin != null)
+                {
+                    return (Pin.Read() == ZoneOn);
+                }
+                else
+                    return _isRunning;
             }
-            else
-                return _isRunning;
         }
     }
 
