@@ -86,10 +86,10 @@ namespace PiSprinkler
             return new PutResponse(PutResponse.ResponseStatus.OK);
         }
 
-        [UriFormat("/zones/{id}/stop")]
-        public IPutResponse StopZone(string id)
+        [UriFormat("/zones/stop")]
+        public IPutResponse StopZone()
         {
-            StartupTask.SprinklerController.StopZone(int.Parse(id));
+            StartupTask.SprinklerController.StopZone();
             return new PutResponse(PutResponse.ResponseStatus.OK);
         }
     }

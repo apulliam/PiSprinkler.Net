@@ -14,6 +14,7 @@ namespace SprinklerCore
         private int MaxTime = 60;
         private List<WateringCycle> _cycles = new List<WateringCycle>();
         private Dictionary<int, ZoneController> _zoneControllers = new Dictionary<int, ZoneController>();
+        private ZoneController _manualZone = null;
         private bool _done = false;
         private ThreadPoolTimer _timer = null;
 
@@ -106,26 +107,18 @@ namespace SprinklerCore
         {
             ValidateZone(zoneNumber);
             var zoneController = _zoneControllers[zoneNumber];
-            return zoneController.IsRunning;
+            return _manualZone == zoneController || zoneController.IsRunning;
         }
 
         public void StartZone(int zoneNumber)
         {
             ValidateZone(zoneNumber);
-            // turn off other zones first
-            //_zoneControllers.ToList().Select(z => z.Value.IsManual = false);
-            var zoneController = _zoneControllers[zoneNumber];
-            zoneController.IsManual = true;
-            zoneController.Start();
+            _manualZone = _zoneControllers[zoneNumber];
         }
 
-        public void StopZone(int zoneNumber)
+        public void StopZone()
         {
-            ValidateZone(zoneNumber);
-            var zoneController = _zoneControllers[zoneNumber];
-            zoneController.IsManual = false;
-            // No need to stop manually - scheduler will stop
-            //zoneController.Stop();
+            _manualZone = null;
         }
 
         public Guid AddWateringCycle(CycleConfig cycleConfig)
@@ -199,11 +192,11 @@ namespace SprinklerCore
 
         public void RunWateringCycles()
         {
-           _timer = ThreadPoolTimer.CreateTimer(TimerCallback, TimeSpan.FromSeconds(1));
+           _timer = ThreadPoolTimer.CreateTimer(Scheduler, TimeSpan.FromSeconds(1));
             
         }
 
-        private void TimerCallback(object state)
+        private void Scheduler(object state)
         {
 
             if (!_done)
@@ -212,39 +205,44 @@ namespace SprinklerCore
 
                 lock (_cycles)
                 {
-                    IEnumerable<ZoneController> nonRunningZones = null;
-                    var runningCycle = _cycles.Where(cycle => cycle.IsRunning(currentTime)).FirstOrDefault();
-                    if (runningCycle != null)
+                    ZoneController turnOn = null;
+                    IEnumerable<ZoneController> turnOff = null;
+                    if (_manualZone == null)
                     {
-                        Debug.WriteLine("cycle " + runningCycle.CycleId + " is running");
-                        var runningZone = runningCycle.Zones.Where(zone => zone.IsRunning(currentTime)).FirstOrDefault();
-                        if (runningZone != null)
+                        var runningCycle = _cycles.Where(cycle => cycle.IsRunning(currentTime)).FirstOrDefault();
+                        if (runningCycle != null)
                         {
-                            Debug.WriteLine("Current time is " + currentTime.TimeOfDay + " zone " + runningZone.ZoneId + " is running.");
-                            _zoneControllers[runningZone.ZoneId].Start();
+                            Debug.WriteLine("cycle " + runningCycle.CycleId + " is running");
+                            var runningZone = runningCycle.Zones.Where(zone => zone.IsRunning(currentTime)).FirstOrDefault();
+                            if (runningZone != null)
+                            {
+                                Debug.WriteLine("Current time is " + currentTime.TimeOfDay + " zone " + runningZone.ZoneId + " is running.");
+                                turnOn = _zoneControllers[runningZone.ZoneId];
+                            }
+
                         }
-                        nonRunningZones = _zoneControllers.Where(zoneController => zoneController.Key != runningZone.ZoneId).Select(zoneController => zoneController.Value);
+
                     }
                     else
-                        nonRunningZones = _zoneControllers.Select(zoneController => zoneController.Value);
-                    
-                    foreach (var zone in nonRunningZones)
-                    { 
-                        if (!_zoneControllers[zone.ZoneNumber].IsManual)
-                        {
+                    {
+                        Debug.WriteLine("zone " + _manualZone.ZoneNumber + " is manual mode");
 
-                            _zoneControllers[zone.ZoneNumber].Stop();
-                        }
-                        else
-                        {
-                            Debug.WriteLine("zone " + zone.ZoneNumber + " is manual mode");
-                        }
+                        turnOn = _manualZone;
+
                     }
-                }
 
+                    if (turnOn != null)
+                        turnOff = _zoneControllers.Where(zoneController => zoneController.Value != turnOn).Select(zoneController => zoneController.Value);
+                    else
+                        turnOff = _zoneControllers.Select(zoneController => zoneController.Value);
+
+                    turnOff.ToList().ForEach(zoneController => zoneController.Stop());
+                    if (turnOn != null)
+                        turnOn.Start();
+                }
                 if (!_done)
                 {
-                    _timer = ThreadPoolTimer.CreateTimer(TimerCallback, TimeSpan.FromSeconds(1));
+                    _timer = ThreadPoolTimer.CreateTimer(Scheduler, TimeSpan.FromSeconds(1));
                 }
                 //await System.Threading.Tasks.Task.Delay(1000);
             }

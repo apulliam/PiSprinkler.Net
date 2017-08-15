@@ -34,8 +34,6 @@ namespace SprinklerCore
 
         public int PinNumber { get; protected set; }
 
-        public bool IsManual { get;  set; }
-
         private bool _isRunning = false;
 
         private GpioPin Pin { get; set; }
@@ -55,7 +53,6 @@ namespace SprinklerCore
 
         public void Stop()
         {
-            IsManual = false;
             if (Pin != null)
             {
                 if (Pin.Read() == ZoneOn)
