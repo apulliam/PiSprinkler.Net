@@ -53,13 +53,14 @@ namespace SprinklerCore
             var cycles = new List<WateringCycle>();
             foreach (var day in cycleConfig.DaysOfWeek)
             {
-                cycles.Add(new WateringCycle(program, day, cycleConfig.StartHour, cycleConfig.StartHour, cycleConfig.ZoneConfigs));
+                cycles.Add(new WateringCycle(program, day, cycleConfig.StartHour, cycleConfig.StartMinute, cycleConfig.ZoneConfigs));
             }
             return cycles;
         }
 
         internal WateringCycle(Program program, DayOfWeek dayOfWeek, int startHour, int startMinute, ZoneConfig[] zoneConfigs)
         {
+            Program = program;
             DayOfWeek = dayOfWeek;
             StartHour = startHour;
             StartMinute = startMinute;
