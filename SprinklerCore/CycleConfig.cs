@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SprinklerCore
 {
-    public class CycleConfig
+    public sealed class CycleConfig
     {
         public string Name
         {
@@ -14,7 +10,7 @@ namespace SprinklerCore
             set;
         }
 
-        public DayOfWeek DayOfWeek
+        public DayOfWeek[] DaysOfWeek
         {
             get;
             set;
@@ -32,11 +28,12 @@ namespace SprinklerCore
             set;
         }
 
-        public IEnumerable<ZoneConfig> ZoneConfigs
+        public ZoneConfig[] ZoneConfigs
         {
             get;
             set;
         }
-      
+
+        
     }
 }

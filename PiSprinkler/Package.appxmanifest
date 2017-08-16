@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
   <Identity Name="PiSprinkler-uwp" Publisher="CN=Alan" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="6d1461d4-7653-407a-bf3d-473e33fe082c" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <mp:PhoneIdentity PhoneProductId="ad5c5750-c31f-45aa-85b9-3648fd968973" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>PiSprinkler</DisplayName>
     <PublisherDisplayName>Alan</PublisherDisplayName>

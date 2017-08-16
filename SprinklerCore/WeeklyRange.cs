@@ -30,7 +30,7 @@ namespace SprinklerCore
             return (x1 <= y2 && y1 <= x2);
         }
 
-        internal bool ConflictsWith(WateringCycle cycle)
+        public bool ConflictsWith(WateringCycle cycle)
         {
             if (EndMinuteOfWeek > StartMinuteOfWeek && cycle.EndMinuteOfWeek > cycle.StartMinuteOfWeek)
             {
@@ -51,10 +51,10 @@ namespace SprinklerCore
            
         }
 
-        public bool IsRunning(DateTime dateTime)
+        public bool IsRunning(DayOfWeek dayOfWeek, int hour, int minute)
         {
             bool isRunning = false;
-            var minuteOfWeek = ToMinuteOfWeek(dateTime.DayOfWeek, dateTime.Hour, dateTime.Minute);
+            var minuteOfWeek = ToMinuteOfWeek(dayOfWeek, hour, minute);
             if (EndMinuteOfWeek > StartMinuteOfWeek)
                 isRunning = (StartMinuteOfWeek <= minuteOfWeek && EndMinuteOfWeek > minuteOfWeek);
             else

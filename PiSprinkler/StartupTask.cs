@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Http;
-using Windows.ApplicationModel.Background;
-using Restup.Webserver.File;
+﻿using Windows.ApplicationModel.Background;
 using Restup.Webserver.Http;
 using Restup.Webserver.Rest;
 using SprinklerCore;
@@ -32,14 +26,14 @@ namespace PiSprinkler
            _deferral = taskInstance.GetDeferral();
 
             _sprinklerController = new SprinklerController();
-            _sprinklerController.RunWateringCycles();
+            _sprinklerController.RunScheduler();
 
             var restRouteHandler = new RestRouteHandler();
 
             restRouteHandler.RegisterController<Sprinkler>();
             
             var configuration = new HttpServerConfiguration()
-                .ListenOnPort(80)
+                .ListenOnPort(8000)
                 .RegisterRoute("api",restRouteHandler);
      
             var httpServer = new HttpServer(configuration);

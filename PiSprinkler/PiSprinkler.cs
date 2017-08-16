@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Restup.Webserver.Attributes;
 using Restup.Webserver.Models.Contracts;
 using Restup.Webserver.Models.Schemas;
@@ -11,32 +7,32 @@ using SprinklerCore;
 namespace PiSprinkler
 {
     [RestController(InstanceCreationType.PerCall)]
-    public sealed class Sprinkler
+    internal class Sprinkler
     {
-        [UriFormat("/cycles")]
-        public IGetResponse GetAllWateringCycles()
+        [UriFormat("/programs")]
+        public IGetResponse GetAllPrograms()
         {
             return new GetResponse(
                 GetResponse.ResponseStatus.OK,
-                StartupTask.SprinklerController.GetAllWateringCycles());
+                StartupTask.SprinklerController.GetAllPrograms());
         }
 
-        [UriFormat("/cycles")]
-        public IDeleteResponse ClearWateringCycles()
+        [UriFormat("/programs")]
+        public IDeleteResponse ClearAllPrograms()
         {
-            StartupTask.SprinklerController.ClearWateringCycles();
+            StartupTask.SprinklerController.ClearAllPrograms();
             return new DeleteResponse(DeleteResponse.ResponseStatus.OK);
         }
 
-        [UriFormat("/cycles/{id}")]
-        public IGetResponse GetAllWateringCycle(string id)
+        [UriFormat("/programs/{id}")]
+        public IGetResponse GetProgram(string id)
         {
             return new GetResponse(
                 GetResponse.ResponseStatus.OK,
-                StartupTask.SprinklerController.GetWateringCycle(Guid.Parse(id)));
+                StartupTask.SprinklerController.GetProgram(Guid.Parse(id)));
         }
 
-        [UriFormat("/cycles/zones/{zoneNumber}")]
+        [UriFormat("/programs/zones/{zoneNumber}")]
         public IGetResponse GetWateringCyclesByZone(string zoneNumber)
         {
             return new GetResponse(
@@ -48,18 +44,18 @@ namespace PiSprinkler
         /// Make sure the number of parameters in your UriFormat match the parameters in your method and
         /// the names (case sensitive) and order are respected.
         /// </summary>
-        [UriFormat("/cycles/{id}")]
-        public IDeleteResponse DeleteWateringCycle(string id)
+        [UriFormat("/programs/{id}")]
+        public IDeleteResponse DeleteProgram(string id)
         {
-            var response = StartupTask.SprinklerController.DeleteWateringCycle(Guid.Parse(id)) ? DeleteResponse.ResponseStatus.OK : DeleteResponse.ResponseStatus.NotFound;
+            var response = StartupTask.SprinklerController.DeleteProgram(Guid.Parse(id)) ? DeleteResponse.ResponseStatus.OK : DeleteResponse.ResponseStatus.NotFound;
             return new DeleteResponse(response);
         }
 
-        [UriFormat("/cycles")]
-        public IPostResponse AddWateringCycle([FromContent] CycleConfig cycle)
+        [UriFormat("/programs/{name}")]
+        public IPostResponse AddProgram([FromContent] ProgramConfig programConfig)
         {
-            var cycleId = StartupTask.SprinklerController.AddWateringCycle(cycle.ToInternal());
-            return new PostResponse(PostResponse.ResponseStatus.Created, $"{cycleId}");
+            var programId = StartupTask.SprinklerController.AddProgram(programConfig);
+            return new PostResponse(PostResponse.ResponseStatus.Created, $"{programId}");
         }
 
         [UriFormat("/zones")]
