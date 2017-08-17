@@ -51,7 +51,7 @@ namespace PiSprinkler
             return new DeleteResponse(response);
         }
 
-        [UriFormat("/programs/{name}")]
+        [UriFormat("/programs")]
         public IPostResponse AddProgram([FromContent] ProgramConfig programConfig)
         {
             var programId = StartupTask.SprinklerController.AddProgram(programConfig);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace SprinklerCore
@@ -30,10 +31,22 @@ namespace SprinklerCore
         internal Program(ProgramConfig programConfig)
         {
             Id = Guid.NewGuid();
-            Name = programConfig.ProgramName;
+            Name = programConfig.Name;
             foreach (var config in programConfig.CycleConfigs)
             {
                 _cycles.AddRange(WateringCycle.ToWateringCycles(this, config));
+            }
+        }
+
+        [JsonConstructor]
+        internal Program(Guid Id, string Name, WateringCycle[] Cycles)
+        {
+            this.Id = Id;
+            this.Name = Name;
+            foreach (var cycle in Cycles)
+            {
+                cycle.Parent = this;
+                _cycles.Add(cycle);
             }
         }
     }

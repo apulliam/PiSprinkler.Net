@@ -2,17 +2,17 @@
 
 namespace SprinklerCore
 {
-    public sealed class ZoneCycle : WeeklyRange
+    public sealed class Zone : WeeklyRange
     {
-        public int ZoneId
+        public int Id
         {
             get;
             private set;
         }
-       
-        internal ZoneCycle(int zoneId, int startMinuteOfWeek, int runTime)
+
+        internal Zone(int zoneId, int startMinuteOfWeek, int runTime)
         {
-            ZoneId = zoneId;
+            Id = zoneId;
             RunTime = runTime;
 
             if (startMinuteOfWeek >= 10080)
@@ -31,18 +31,14 @@ namespace SprinklerCore
                 EndMinuteOfWeek = endMinuteOfWeek;
         }
 
-        internal ZoneCycle()
-        {
-        }
-
         [JsonConstructor]
-        internal ZoneCycle(int ZoneId, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
+        internal Zone(int ZoneId, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
         {
-            this.ZoneId = ZoneId;
+            this.Id = ZoneId;
             this.RunTime = RunTime;
             this.StartMinuteOfWeek = StartMinuteOfWeek;
             this.EndMinuteOfWeek = EndMinuteOfWeek;
-            
+
         }
     }
 }

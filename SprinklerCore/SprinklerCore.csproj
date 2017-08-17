@@ -116,7 +116,7 @@
     <Compile Include="WeeklyRange.cs" />
     <Compile Include="ZoneConfig.cs" />
     <Compile Include="ZoneController.cs" />
-    <Compile Include="ZoneCycle.cs" />
+    <Compile Include="Zone.cs" />
     <EmbeddedResource Include="Properties\SprinklerCore.rd.xml" />
   </ItemGroup>
   <ItemGroup>

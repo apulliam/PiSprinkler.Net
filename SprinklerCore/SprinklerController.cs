@@ -82,7 +82,7 @@ namespace SprinklerCore
                 foreach (var zoneTime in cycleConfig.ZoneConfigs)
                 {
                     ValidateZone(zoneTime.ZoneNumber);
-                    ValidateTime(zoneTime.Time);
+                    ValidateTime(zoneTime.RunTime);
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace SprinklerCore
                 foreach (var newCycle in newProgram.Cycles)
                     foreach (var cycle in cycles)
                         if (newCycle.ConflictsWith(cycle))
-                            throw new SprinklerControllerException($"Program overlaps with program {cycle.Program.Id}, cycle {cycle.Id}");
+                            throw new SprinklerControllerException($"Program overlaps with program {cycle.Parent.Id}, cycle {cycle.Id}");
 
                 _programs.Add(newProgram);
                 WritePrograms();
@@ -175,7 +175,7 @@ namespace SprinklerCore
             lock (_programs)
             {
                 var cycles = _programs.SelectMany(program => program.Cycles);
-                return cycles.Where(cycle => cycle.Zones.Any(zone => zone.ZoneId == zoneNumber));
+                return cycles.Where(cycle => cycle.Zones.Any(zone => zone.Id == zoneNumber));
             }
         }
 
@@ -208,12 +208,12 @@ namespace SprinklerCore
                         var runningCycle = cycles.Where(cycle => cycle.IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute)).FirstOrDefault();
                         if (runningCycle != null)
                         {
-                            Debug.WriteLine("Program {0}({1}), cycle {2} is running", runningCycle.Program.Name, runningCycle.Program.Id, runningCycle.Id);
+                            Debug.WriteLine("Program {0}({1}), cycle {2} is running", runningCycle.Parent.Name, runningCycle.Parent.Id, runningCycle.Id);
                             var runningZone = runningCycle.Zones.Where(zone => zone.IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute)).FirstOrDefault();
                             if (runningZone != null)
                             {
-                                Debug.WriteLine("Current time is " + currentTime.TimeOfDay + " zone " + runningZone.ZoneId + " is running.");
-                                turnOn = _zoneControllers[runningZone.ZoneId];
+                                Debug.WriteLine("Current time is " + currentTime.TimeOfDay + " zone " + runningZone.Id + " is running.");
+                                turnOn = _zoneControllers[runningZone.Id];
                             }
 
                         }

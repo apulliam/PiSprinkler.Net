@@ -7,10 +7,18 @@ namespace SprinklerCore
 {
     public class WateringCycle : WeeklyRange
     {
-        internal Program Program
+        //public string Program
+        //{
+        //    get
+        //    {
+        //        return Parent.Name;
+        //    }
+        //}
+
+        internal Program Parent
         {
             get;
-            private set;
+            set;
         }
 
         public Guid Id
@@ -38,9 +46,9 @@ namespace SprinklerCore
             private set;
         }
 
-        private List<ZoneCycle> _zones = new List<ZoneCycle>();
+        private List<Zone> _zones = new List<Zone>();
 
-        public List<ZoneCycle> Zones
+        public List<Zone> Zones
         {
             get
             {
@@ -58,9 +66,10 @@ namespace SprinklerCore
             return cycles;
         }
 
+      
         internal WateringCycle(Program program, DayOfWeek dayOfWeek, int startHour, int startMinute, ZoneConfig[] zoneConfigs)
         {
-            Program = program;
+            Parent = program;
             DayOfWeek = dayOfWeek;
             StartHour = startHour;
             StartMinute = startMinute;
@@ -71,8 +80,8 @@ namespace SprinklerCore
             var runTime = 0;
             foreach (var zoneConfig in zoneConfigs)
             {
-                var zone = new ZoneCycle(zoneConfig.ZoneNumber, StartMinuteOfWeek + runTime, zoneConfig.Time);
-                runTime += zoneConfig.Time;
+                var zone = new Zone(zoneConfig.ZoneNumber, StartMinuteOfWeek + runTime, zoneConfig.RunTime);
+                runTime += zoneConfig.RunTime;
                 Zones.Add(zone);
             }
             RunTime = runTime;
@@ -84,15 +93,16 @@ namespace SprinklerCore
             else
                 EndMinuteOfWeek = endMinuteOfWeek;
         }
-    
 
+       
         [JsonConstructor]
-        internal WateringCycle(Guid CycleId, DayOfWeek DayOfWeek, int StartHour, int StartMinute, IEnumerable<ZoneCycle> Zones, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
+        internal WateringCycle(Guid Id, DayOfWeek DayOfWeek, int StartHour, int StartMinute, IEnumerable<Zone> Zones, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
         {
-            this.Id = CycleId;
+            this.Id = Id;
             this.DayOfWeek = DayOfWeek;
             this.StartHour = StartHour;
             this.StartMinute = StartMinute;
+
             this.StartMinuteOfWeek = StartMinuteOfWeek;
             this.EndMinuteOfWeek = EndMinuteOfWeek;
             this.RunTime = RunTime;
@@ -100,6 +110,6 @@ namespace SprinklerCore
                 _zones.Add(zone);
         }
 
-       
+
     }
 }

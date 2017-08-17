@@ -11,7 +11,7 @@ namespace SprinklerCoreUnitTest
         public void TestNonOverlappingCycles()
         {
             var sprinklerController = new SprinklerController();
-            var zoneConfig = new ZoneConfig { ZoneNumber = 1, Time = 10 };
+            var zoneConfig = new ZoneConfig { ZoneNumber = 1, RunTime = 10 };
 
             sprinklerController.AddProgram(new ProgramConfig("Program 1",
                 new CycleConfig[]
@@ -44,7 +44,7 @@ namespace SprinklerCoreUnitTest
         public void TestOverlappingCycles()
         {
             var sprinklerController = new SprinklerController();
-            var zoneConfig = new ZoneConfig { ZoneNumber = 1, Time = 10 };
+            var zoneConfig = new ZoneConfig { ZoneNumber = 1, RunTime = 10 };
             
             sprinklerController.AddProgram(new ProgramConfig("Program 1",
                 new CycleConfig[]
@@ -75,7 +75,7 @@ namespace SprinklerCoreUnitTest
         public void TestOverlappingCyclesWeekRollover()
         {
             var sprinklerController = new SprinklerController();
-            var zoneConfig = new ZoneConfig { ZoneNumber = 1, Time = 10 };
+            var zoneConfig = new ZoneConfig { ZoneNumber = 1, RunTime = 10 };
 
 
             sprinklerController.AddProgram(new ProgramConfig("Program 1", new CycleConfig[]
@@ -113,8 +113,8 @@ namespace SprinklerCoreUnitTest
             var sprinklerController = new SprinklerController();
             var zoneConfigs = new ZoneConfig[] 
             {
-                new ZoneConfig { ZoneNumber = 1, Time = 10 },
-                new ZoneConfig { ZoneNumber = 5, Time = 10 }
+                new ZoneConfig { ZoneNumber = 1, RunTime = 10 },
+                new ZoneConfig { ZoneNumber = 5, RunTime = 10 }
             };
 
             var programId = sprinklerController.AddProgram(new ProgramConfig("Program 1", 

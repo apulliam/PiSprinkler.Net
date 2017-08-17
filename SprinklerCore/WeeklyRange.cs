@@ -30,7 +30,7 @@ namespace SprinklerCore
             return (x1 <= y2 && y1 <= x2);
         }
 
-        public bool ConflictsWith(WateringCycle cycle)
+        internal bool ConflictsWith(WateringCycle cycle)
         {
             if (EndMinuteOfWeek > StartMinuteOfWeek && cycle.EndMinuteOfWeek > cycle.StartMinuteOfWeek)
             {
