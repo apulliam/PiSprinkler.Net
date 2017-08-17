@@ -32,9 +32,9 @@ namespace SprinklerCore
         }
 
         [JsonConstructor]
-        internal Zone(int ZoneId, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
+        internal Zone(int Id, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
         {
-            this.Id = ZoneId;
+            this.Id = Id;
             this.RunTime = RunTime;
             this.StartMinuteOfWeek = StartMinuteOfWeek;
             this.EndMinuteOfWeek = EndMinuteOfWeek;
