@@ -9,6 +9,7 @@ namespace PiSprinkler
     [RestController(InstanceCreationType.PerCall)]
     internal class Sprinkler
     {
+        
         [UriFormat("/programs")]
         public IGetResponse GetAllPrograms()
         {
@@ -32,7 +33,15 @@ namespace PiSprinkler
                 StartupTask.SprinklerController.GetProgram(Guid.Parse(id)));
         }
 
-        [UriFormat("/zones/{zoneNumber}/programs")]
+        [UriFormat("/cycles")]
+        public IGetResponse GetAllWateringCycles()
+        {
+            return new GetResponse(
+                GetResponse.ResponseStatus.OK,
+                StartupTask.SprinklerController.GetAllWateringCycles());
+        }
+
+        [UriFormat("/cycles/{zoneNumber}")]
         public IGetResponse GetWateringCyclesByZone(string zoneNumber)
         {
             return new GetResponse(

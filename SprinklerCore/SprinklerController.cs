@@ -175,6 +175,14 @@ namespace SprinklerCore
             }
         }
 
+        public IEnumerable<WateringCycle> GetAllWateringCycles()
+        {
+            lock (this)
+            {
+                return _cycles;
+            }
+        }
+
         public IEnumerable<WateringCycle> GetWateringCyclesByZone(int zoneNumber)
         {
             ValidateZone(zoneNumber);
