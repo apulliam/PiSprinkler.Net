@@ -90,21 +90,5 @@ namespace SprinklerCore
         }
 
        
-        [JsonConstructor]
-        internal WateringCycle(Guid Id, DayOfWeek DayOfWeek, int StartHour, int StartMinute, IEnumerable<Zone> Zones, int StartMinuteOfWeek, int RunTime, int EndMinuteOfWeek)
-        {
-            this.Id = Id;
-            this.DayOfWeek = DayOfWeek;
-            this.StartHour = StartHour;
-            this.StartMinute = StartMinute;
-
-            this.StartMinuteOfWeek = StartMinuteOfWeek;
-            this.EndMinuteOfWeek = EndMinuteOfWeek;
-            this.RunTime = RunTime;
-            foreach (var zone in Zones)
-                _zones.Add(zone);
-        }
-
-
     }
 }
