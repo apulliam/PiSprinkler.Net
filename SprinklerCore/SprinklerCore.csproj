@@ -108,7 +108,6 @@
   <ItemGroup>
     <Compile Include="CycleConfig.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgramConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SprinklerController.cs" />
     <Compile Include="SprinklerControllerException.cs" />

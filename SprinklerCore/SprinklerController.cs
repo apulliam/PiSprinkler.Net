@@ -12,6 +12,7 @@ namespace SprinklerCore
     {
         private int MaxTime = 60;
         private List<Program> _programs = new List<Program>();
+        private List<WateringCycle> _cycles = new List<WateringCycle>();
         private Dictionary<int, ZoneController> _zoneControllers = new Dictionary<int, ZoneController>();
         private ZoneController _manualZone = null;
         private bool _done = false;
@@ -33,7 +34,11 @@ namespace SprinklerCore
             {
                 var serializedPrograms = await FileIO.ReadTextAsync(programs as StorageFile);
                 if (serializedPrograms != null)
+                {
                     _programs = JsonConvert.DeserializeObject<List<Program>>(serializedPrograms);
+                    foreach(var program in _programs)
+                        _cycles.AddRange(WateringCycle.ToWateringCycles(program));
+                }
             }
         }
 
@@ -116,36 +121,36 @@ namespace SprinklerCore
             _manualZone = null;
         }
 
-        public Guid AddProgram(ProgramConfig programConfig)
+        public Guid AddProgram(Program programConfig)
         {
 
-            ValidateCycleConfigs(programConfig.CycleConfigs);
+            ValidateCycleConfigs(programConfig.Cycles);
             
-            var newProgram = new Program(programConfig);
-            lock (_programs)
+            lock (this)
             {
-                var cycles = _programs.SelectMany(program => program.Cycles);
-             
-                foreach (var newCycle in newProgram.Cycles)
-                    foreach (var cycle in cycles)
+                var newCycles = WateringCycle.ToWateringCycles(programConfig);
+                foreach (var newCycle in newCycles)
+                    foreach (var cycle in _cycles)
                         if (newCycle.ConflictsWith(cycle))
                             throw new SprinklerControllerException($"Program overlaps with program {cycle.Parent.Id}, cycle {cycle.Id}");
-
-                _programs.Add(newProgram);
+                _cycles.AddRange(newCycles);
+                
+                _programs.Add(programConfig);
                 WritePrograms();
             }
-            return newProgram.Id;
+            return programConfig.Id;
         }
 
         public bool DeleteProgram(Guid programId)
         {
             var response = false;
-            lock (_programs)
+            lock (this)
             {
                 var programToDelete = _programs.Find(program => program.Id == programId);
                 if (programToDelete != null)
                 {
                     response = _programs.Remove(programToDelete);
+                    _cycles.Where(cycle => cycle.Parent == programToDelete).Select(cycle => _cycles.Remove(cycle));
                     WritePrograms();
                 }
             }
@@ -154,16 +159,17 @@ namespace SprinklerCore
 
         public void ClearAllPrograms()
         {
-            lock (_programs)
+            lock (this)
             {
                 _programs.Clear();
+                _cycles.Clear();
                 WritePrograms();
             }
         }
 
         public Program GetProgram(Guid programId)
         {
-            lock (_programs)
+            lock (this)
             {
                 return _programs.Where(program => program.Id == programId).FirstOrDefault();
             }
@@ -172,16 +178,15 @@ namespace SprinklerCore
         public IEnumerable<WateringCycle> GetWateringCyclesByZone(int zoneNumber)
         {
             ValidateZone(zoneNumber);
-            lock (_programs)
+            lock (this)
             {
-                var cycles = _programs.SelectMany(program => program.Cycles);
-                return cycles.Where(cycle => cycle.Zones.Any(zone => zone.Id == zoneNumber));
+                return _cycles.Where(cycle => cycle.Zones.Any(zone => zone.Id == zoneNumber));
             }
         }
 
         public IEnumerable<Program> GetAllPrograms()
         {
-            lock (_programs)
+            lock (this)
             {
                 return _programs;
             }
@@ -198,14 +203,13 @@ namespace SprinklerCore
             {
                 var currentTime = DateTime.Now;
 
-                lock (_programs)
+                lock (this)
                 {
                     ZoneController turnOn = null;
                     IEnumerable<ZoneController> turnOff = null;
                     if (_manualZone == null)
                     {
-                        var cycles = _programs.SelectMany(program => program.Cycles);
-                        var runningCycle = cycles.Where(cycle => cycle.IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute)).FirstOrDefault();
+                        var runningCycle = _cycles.Where(cycle => cycle.IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute)).FirstOrDefault();
                         if (runningCycle != null)
                         {
                             Debug.WriteLine("Program {0}({1}), cycle {2} is running", runningCycle.Parent.Name, runningCycle.Parent.Id, runningCycle.Id);

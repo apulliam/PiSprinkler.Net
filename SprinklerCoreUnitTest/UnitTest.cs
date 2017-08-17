@@ -13,7 +13,7 @@ namespace SprinklerCoreUnitTest
             var sprinklerController = new SprinklerController();
             var zoneConfig = new ZoneConfig { ZoneNumber = 1, RunTime = 10 };
 
-            sprinklerController.AddProgram(new ProgramConfig("Program 1",
+            sprinklerController.AddProgram(new SprinklerCore.Program("Program 1",
                 new CycleConfig[]
                 {
                     new CycleConfig()
@@ -25,7 +25,7 @@ namespace SprinklerCoreUnitTest
                     }
                 }));
 
-            sprinklerController.AddProgram(new ProgramConfig("Program 2",
+            sprinklerController.AddProgram(new SprinklerCore.Program("Program 2",
                 
                 new CycleConfig[]
                 {
@@ -46,7 +46,7 @@ namespace SprinklerCoreUnitTest
             var sprinklerController = new SprinklerController();
             var zoneConfig = new ZoneConfig { ZoneNumber = 1, RunTime = 10 };
             
-            sprinklerController.AddProgram(new ProgramConfig("Program 1",
+            sprinklerController.AddProgram(new SprinklerCore.Program("Program 1",
                 new CycleConfig[]
                 {
                     new CycleConfig()
@@ -58,7 +58,7 @@ namespace SprinklerCoreUnitTest
                     }
                 }));
 
-            Assert.ThrowsException<SprinklerControllerException>(() => sprinklerController.AddProgram(new ProgramConfig("Program 2",
+            Assert.ThrowsException<SprinklerControllerException>(() => sprinklerController.AddProgram(new SprinklerCore.Program("Program 2",
                 new CycleConfig[]
                 {
                     new CycleConfig()
@@ -78,7 +78,7 @@ namespace SprinklerCoreUnitTest
             var zoneConfig = new ZoneConfig { ZoneNumber = 1, RunTime = 10 };
 
 
-            sprinklerController.AddProgram(new ProgramConfig("Program 1", new CycleConfig[]
+            sprinklerController.AddProgram(new SprinklerCore.Program("Program 1", new CycleConfig[]
                 {
                     new CycleConfig()
                     {
@@ -89,7 +89,7 @@ namespace SprinklerCoreUnitTest
                     }
                 }));
 
-            Assert.ThrowsException<SprinklerControllerException>(() => sprinklerController.AddProgram(new ProgramConfig("Program 2",
+            Assert.ThrowsException<SprinklerControllerException>(() => sprinklerController.AddProgram(new SprinklerCore.Program("Program 2",
                 new CycleConfig[]
                 {
                     new CycleConfig()
@@ -108,16 +108,16 @@ namespace SprinklerCoreUnitTest
         public void TestRunningZone()
         {
             var currentTime = DateTime.Now;
-            var startTime = currentTime.Subtract(TimeSpan.FromMinutes(5));
+            var startTime = currentTime.Subtract(TimeSpan.FromSeconds(90));
           
             var sprinklerController = new SprinklerController();
             var zoneConfigs = new ZoneConfig[] 
             {
-                new ZoneConfig { ZoneNumber = 1, RunTime = 10 },
-                new ZoneConfig { ZoneNumber = 5, RunTime = 10 }
+                new ZoneConfig { ZoneNumber = 1, RunTime = 1 },
+                new ZoneConfig { ZoneNumber = 5, RunTime = 1 }
             };
 
-            var programId = sprinklerController.AddProgram(new ProgramConfig("Program 1", 
+            var programId = sprinklerController.AddProgram(new SprinklerCore.Program("Program 1", 
                 new CycleConfig[]
                 {
                     new CycleConfig()
@@ -128,15 +128,18 @@ namespace SprinklerCoreUnitTest
                         ZoneConfigs = zoneConfigs
                     }
                 }));
-            var program = sprinklerController.GetProgram(programId);
+            var zone1 = sprinklerController.GetZone(1);
+            var zone2 = sprinklerController.GetZone(2);
 
-            Assert.IsTrue(program.Cycles[0].Zones[0].IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute));
-            Assert.IsFalse(program.Cycles[0].Zones[1].IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute));
+            System.Threading.Tasks.Task.Delay(3000);
+            Assert.IsTrue(zone1.IsRunning);
+            Assert.IsFalse(zone2.IsRunning);
 
-            currentTime = currentTime.AddMinutes(10);
+            zone1 = sprinklerController.GetZone(1);
+            zone2 = sprinklerController.GetZone(2);
 
-            Assert.IsFalse(program.Cycles[0].Zones[0].IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute));
-            Assert.IsTrue(program.Cycles[0].Zones[1].IsRunning(currentTime.DayOfWeek, currentTime.Hour, currentTime.Minute));
+            Assert.IsFalse(zone1.IsRunning);
+            Assert.IsTrue(zone2.IsRunning);
 
         }
     }

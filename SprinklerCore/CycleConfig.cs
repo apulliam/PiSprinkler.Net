@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 
 namespace SprinklerCore
 {
@@ -10,6 +12,7 @@ namespace SprinklerCore
             set;
         }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public DayOfWeek[] DaysOfWeek
         {
             get;

@@ -1,53 +1,34 @@
-﻿using Newtonsoft.Json;
+﻿
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace SprinklerCore
 {
     public class Program
     {
-        private List<WateringCycle> _cycles = new List<WateringCycle>();
-
         public Guid Id
         {
             get;
             private set;
         }
 
-        public string Name
-        {
-            get;
-            private set;
-        }
+        public string Name { get; private set; }
 
-        public List<WateringCycle> Cycles
-        {
-            get
-            {
-                return _cycles;
-            }
-        }
+        public CycleConfig[] Cycles { get; private set; }
 
-        internal Program(ProgramConfig programConfig)
+        public Program(string name, CycleConfig[] cycleConfigs)
         {
             Id = Guid.NewGuid();
-            Name = programConfig.Name;
-            foreach (var config in programConfig.CycleConfigs)
-            {
-                _cycles.AddRange(WateringCycle.ToWateringCycles(this, config));
-            }
+            Name = name;
+            Cycles = cycleConfigs;
         }
 
         [JsonConstructor]
-        internal Program(Guid Id, string Name, WateringCycle[] Cycles)
+        public Program(Guid id, string name, CycleConfig[] cycleConfigs)
         {
-            this.Id = Id;
-            this.Name = Name;
-            foreach (var cycle in Cycles)
-            {
-                cycle.Parent = this;
-                _cycles.Add(cycle);
-            }
+            Id = id;
+            Name = name;
+            Cycles = cycleConfigs;
         }
     }
 }

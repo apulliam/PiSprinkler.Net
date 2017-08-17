@@ -51,7 +51,7 @@ namespace SprinklerCore
            
         }
 
-        public bool IsRunning(DayOfWeek dayOfWeek, int hour, int minute)
+        internal bool IsRunning(DayOfWeek dayOfWeek, int hour, int minute)
         {
             bool isRunning = false;
             var minuteOfWeek = ToMinuteOfWeek(dayOfWeek, hour, minute);

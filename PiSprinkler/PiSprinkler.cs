@@ -52,7 +52,7 @@ namespace PiSprinkler
         }
 
         [UriFormat("/programs")]
-        public IPostResponse AddProgram([FromContent] ProgramConfig programConfig)
+        public IPostResponse AddProgram([FromContent] Program programConfig)
         {
             var programId = StartupTask.SprinklerController.AddProgram(programConfig);
             return new PostResponse(PostResponse.ResponseStatus.Created, $"{programId}");

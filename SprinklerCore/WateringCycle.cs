@@ -7,14 +7,6 @@ namespace SprinklerCore
 {
     public class WateringCycle : WeeklyRange
     {
-        //public string Program
-        //{
-        //    get
-        //    {
-        //        return Parent.Name;
-        //    }
-        //}
-
         internal Program Parent
         {
             get;
@@ -56,12 +48,15 @@ namespace SprinklerCore
             }
         }
 
-        internal static List<WateringCycle> ToWateringCycles(Program program, CycleConfig cycleConfig)
+        internal static List<WateringCycle> ToWateringCycles(Program program)
         {
             var cycles = new List<WateringCycle>();
-            foreach (var day in cycleConfig.DaysOfWeek)
+            foreach (var cycle in program.Cycles)
             {
-                cycles.Add(new WateringCycle(program, day, cycleConfig.StartHour, cycleConfig.StartMinute, cycleConfig.ZoneConfigs));
+                foreach (var day in cycle.DaysOfWeek)
+                {
+                    cycles.Add(new WateringCycle(program, day, cycle.StartHour, cycle.StartMinute, cycle.ZoneConfigs));
+                }
             }
             return cycles;
         }
