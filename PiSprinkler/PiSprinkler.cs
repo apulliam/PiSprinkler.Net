@@ -32,7 +32,7 @@ namespace PiSprinkler
                 StartupTask.SprinklerController.GetProgram(Guid.Parse(id)));
         }
 
-        [UriFormat("/programs/zones/{zoneNumber}")]
+        [UriFormat("/zones/{zoneNumber}/programs")]
         public IGetResponse GetWateringCyclesByZone(string zoneNumber)
         {
             return new GetResponse(
