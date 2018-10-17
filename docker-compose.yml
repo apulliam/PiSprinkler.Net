@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  pisprinkler.aspnet:
+    image: ${DOCKER_REGISTRY}pisprinkleraspnet
+    build:
+      context: .
+      dockerfile: PiSprinkler.AspNet/Dockerfile

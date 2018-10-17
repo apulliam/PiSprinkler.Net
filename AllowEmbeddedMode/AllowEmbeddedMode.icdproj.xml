@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ICDProject
+  Name="AllowEmbeddedMode"
+  Description=""
+  Version="10.0.14393.0"
+  Id="{f35aab4c-3071-4225-83cd-1346b96b6538}"
+  TemplateName="Provisioning package"
+  TemplateType="ProvisioningPackage">
+  <TargetEditions>
+    <Sku>
+      <StoreType>File</StoreType>
+      <Name>All Windows editions</Name>
+      <SourcePath>Microsoft-Common-Provisioning.dat</SourcePath>
+      <Edition>WindowsCommon</Edition>
+      <Version>10.0</Version>
+      <Description>Selecting this option will display settings that apply to all Windows editions.</Description>
+    </Sku>
+  </TargetEditions>
+</ICDProject>

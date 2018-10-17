@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using SprinklerDotNet;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SprinklerDotNet.Config;
+using System;
+using System.Threading.Tasks;
 
-namespace SprinklerCoreUnitTest
+namespace SprinklerDotNet.UnitTest
 {
     [TestClass]
-    public class WateringCycleUnitTests
+    public class UnitTest
     {
         [TestMethod]
         public async Task TestNonOverlappingCycles()
@@ -24,7 +23,7 @@ namespace SprinklerCoreUnitTest
             });
 
             await sprinklerController.AddProgram(new CycleProgram()
-            { 
+            {
                 DaysOfWeek = new DayOfWeek[] { DayOfWeek.Monday },
                 StartHour = 9,
                 StartMinute = 41,
@@ -37,14 +36,14 @@ namespace SprinklerCoreUnitTest
         {
             var sprinklerController = new TestSprinklerController();
             var zoneConfig = new ZoneProgram { ZoneNumber = 1, RunTime = 10 };
-            
+
             await sprinklerController.AddProgram(new CycleProgram()
-            { 
+            {
                 DaysOfWeek = new DayOfWeek[] { DayOfWeek.Monday },
                 StartHour = 9,
                 StartMinute = 30,
                 Zones = new ZoneProgram[] { zoneConfig }
-                    
+
             });
 
             Assert.ThrowsException<SprinklerControllerException>(() => sprinklerController.AddProgram(
@@ -55,7 +54,7 @@ namespace SprinklerCoreUnitTest
                     StartMinute = 35,
                     Zones = new ZoneProgram[] { zoneConfig }
                 }));
-                
+
         }
 
         [TestMethod]
@@ -66,22 +65,22 @@ namespace SprinklerCoreUnitTest
 
 
             await sprinklerController.AddProgram(new CycleProgram()
-                    {
-                        DaysOfWeek = new DayOfWeek[] { DayOfWeek.Saturday },
-                        StartHour = 23,
-                        StartMinute = 55,
-                        Zones = new ZoneProgram[] { zoneConfig }
-                    });
+            {
+                DaysOfWeek = new DayOfWeek[] { DayOfWeek.Saturday },
+                StartHour = 23,
+                StartMinute = 55,
+                Zones = new ZoneProgram[] { zoneConfig }
+            });
 
             Assert.ThrowsException<SprinklerControllerException>(() => sprinklerController.AddProgram(new CycleProgram()
-                {
-                
-                    DaysOfWeek = new DayOfWeek[] { DayOfWeek.Sunday },
-                    StartHour = 0,
-                    StartMinute = 0,
-                    Zones = new ZoneProgram[] { zoneConfig }
-                 
-                }));
+            {
+
+                DaysOfWeek = new DayOfWeek[] { DayOfWeek.Sunday },
+                StartHour = 0,
+                StartMinute = 0,
+                Zones = new ZoneProgram[] { zoneConfig }
+
+            }));
         }
 
 
@@ -91,9 +90,9 @@ namespace SprinklerCoreUnitTest
         {
             var currentTime = DateTime.Now;
             var startTime = currentTime.Subtract(TimeSpan.FromSeconds(90));
-          
+
             var sprinklerController = new TestSprinklerController();
-            var zoneConfigs = new ZoneProgram[] 
+            var zoneConfigs = new ZoneProgram[]
             {
                 new ZoneProgram { ZoneNumber = 1, RunTime = 1 },
                 new ZoneProgram { ZoneNumber = 5, RunTime = 1 }

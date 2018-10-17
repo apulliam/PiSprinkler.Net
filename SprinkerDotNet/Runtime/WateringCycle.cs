@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SprinklerDotNet.Config;
 
-namespace SprinklerCore
+namespace SprinklerDotNet.Runtime
 {
     public class WateringCycle : WeeklyRange
     {
-        internal Program Parent
+        internal CycleProgram Program
         {
             get;
             set;
@@ -19,7 +18,6 @@ namespace SprinklerCore
             private set;
         }
               
-        [JsonConverter(typeof(StringEnumConverter))]
         public DayOfWeek DayOfWeek
         {
             get;
@@ -38,9 +36,9 @@ namespace SprinklerCore
             private set;
         }
 
-        private List<Zone> _zones = new List<Zone>();
+        private List<ZoneCycle> _zones = new List<ZoneCycle>();
 
-        public List<Zone> Zones
+        public List<ZoneCycle> Zones
         {
             get
             {
@@ -48,23 +46,9 @@ namespace SprinklerCore
             }
         }
 
-        internal static List<WateringCycle> ToWateringCycles(Program program)
+        internal WateringCycle(CycleProgram cycleConfig, DayOfWeek dayOfWeek, int startHour, int startMinute, ZoneProgram[] zoneConfigs)
         {
-            var cycles = new List<WateringCycle>();
-            foreach (var cycle in program.Cycles)
-            {
-                foreach (var day in cycle.DaysOfWeek)
-                {
-                    cycles.Add(new WateringCycle(program, day, cycle.StartHour, cycle.StartMinute, cycle.Zones));
-                }
-            }
-            return cycles;
-        }
-
-      
-        internal WateringCycle(Program program, DayOfWeek dayOfWeek, int startHour, int startMinute, ZoneConfig[] zoneConfigs)
-        {
-            Parent = program;
+            Program = cycleConfig;
             DayOfWeek = dayOfWeek;
             StartHour = startHour;
             StartMinute = startMinute;
@@ -75,7 +59,7 @@ namespace SprinklerCore
             var runTime = 0;
             foreach (var zoneConfig in zoneConfigs)
             {
-                var zone = new Zone(zoneConfig.ZoneNumber, StartMinuteOfWeek + runTime, zoneConfig.RunTime);
+                var zone = new ZoneCycle(zoneConfig.ZoneNumber, StartMinuteOfWeek + runTime, zoneConfig.RunTime);
                 runTime += zoneConfig.RunTime;
                 Zones.Add(zone);
             }

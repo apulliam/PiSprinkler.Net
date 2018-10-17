@@ -1,7 +1,7 @@
 ﻿using Windows.ApplicationModel.Background;
 using Restup.Webserver.Http;
 using Restup.Webserver.Rest;
-using SprinklerCore;
+using SprinklerDotNet;
 
 // The Background Application template is documented at http://go.microsoft.com/fwlink/?LinkID=533884&clcid=0x409
 
@@ -9,15 +9,15 @@ namespace PiSprinkler
 {
     public sealed class StartupTask : IBackgroundTask
     {
-        private static SprinklerController _sprinklerController;
+        private static SprinklerBase _sprinkler;
         private HttpServer _httpServer;
         private BackgroundTaskDeferral _deferral;
 
-        internal static SprinklerController SprinklerController
+        internal static SprinklerBase Sprinkler
         {
             get
             {
-                return _sprinklerController;
+                return _sprinkler;
             }
         }
 
@@ -25,12 +25,13 @@ namespace PiSprinkler
         {
            _deferral = taskInstance.GetDeferral();
 
-            _sprinklerController = new SprinklerController();
-            _sprinklerController.RunScheduler();
+            _sprinkler = new Sprinkler();
+            await _sprinkler.Initialize();
+            await _sprinkler.StartScheduler();
 
             var restRouteHandler = new RestRouteHandler();
 
-            restRouteHandler.RegisterController<Sprinkler>();
+            restRouteHandler.RegisterController<SprinklerController>();
             
             var configuration = new HttpServerConfiguration()
                 .ListenOnPort(80)
