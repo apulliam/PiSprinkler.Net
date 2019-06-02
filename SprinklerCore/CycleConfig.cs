@@ -6,12 +6,6 @@ namespace SprinklerCore
 {
     public sealed class CycleConfig
     {
-        public string Name
-        {
-            get;
-            set;
-        }
-
         [JsonConverter(typeof(StringEnumConverter))]
         public DayOfWeek[] DaysOfWeek
         {
@@ -31,12 +25,16 @@ namespace SprinklerCore
             set;
         }
 
-        public ZoneConfig[] ZoneConfigs
+        public ZoneConfig[] Zones
         {
             get;
             set;
         }
 
+        [JsonConstructor]
+        public CycleConfig()
+        {
+        }
         
     }
 }

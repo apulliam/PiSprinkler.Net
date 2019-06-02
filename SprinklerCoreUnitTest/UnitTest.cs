@@ -21,7 +21,7 @@ namespace SprinklerCoreUnitTest
                         DaysOfWeek = new DayOfWeek[] { DayOfWeek.Monday },
                         StartHour = 9,
                         StartMinute = 30,
-                        ZoneConfigs = new ZoneConfig[] { zoneConfig }
+                        Zones = new ZoneConfig[] { zoneConfig }
                     }
                 }));
 
@@ -34,7 +34,7 @@ namespace SprinklerCoreUnitTest
                         DaysOfWeek = new DayOfWeek[] { DayOfWeek.Monday },
                         StartHour = 9,
                         StartMinute = 41,
-                        ZoneConfigs = new ZoneConfig[] { zoneConfig }
+                        Zones = new ZoneConfig[] { zoneConfig }
                     }
                 
                 }));
@@ -54,7 +54,7 @@ namespace SprinklerCoreUnitTest
                         DaysOfWeek = new DayOfWeek[] { DayOfWeek.Monday },
                         StartHour = 9,
                         StartMinute = 30,
-                        ZoneConfigs = new ZoneConfig[] { zoneConfig }
+                        Zones = new ZoneConfig[] { zoneConfig }
                     }
                 }));
 
@@ -66,7 +66,7 @@ namespace SprinklerCoreUnitTest
                         DaysOfWeek = new DayOfWeek[] { DayOfWeek.Monday },
                         StartHour = 9,
                         StartMinute = 35,
-                        ZoneConfigs = new ZoneConfig[] { zoneConfig }
+                        Zones = new ZoneConfig[] { zoneConfig }
                     }
                 })));
         }
@@ -85,7 +85,7 @@ namespace SprinklerCoreUnitTest
                         DaysOfWeek = new DayOfWeek[] { DayOfWeek.Saturday },
                         StartHour = 23,
                         StartMinute = 55,
-                        ZoneConfigs = new ZoneConfig[] { zoneConfig }
+                        Zones = new ZoneConfig[] { zoneConfig }
                     }
                 }));
 
@@ -97,7 +97,7 @@ namespace SprinklerCoreUnitTest
                         DaysOfWeek = new DayOfWeek[] { DayOfWeek.Sunday },
                         StartHour = 0,
                         StartMinute = 0,
-                        ZoneConfigs = new ZoneConfig[] { zoneConfig }
+                        Zones = new ZoneConfig[] { zoneConfig }
                     }
                 })));
         }
@@ -125,7 +125,7 @@ namespace SprinklerCoreUnitTest
                         DaysOfWeek = new DayOfWeek[] { startTime.DayOfWeek },
                         StartHour = startTime.Hour,
                         StartMinute = startTime.Minute,
-                        ZoneConfigs = zoneConfigs
+                        Zones = zoneConfigs
                     }
                 }));
             var zone1 = sprinklerController.GetZone(1);

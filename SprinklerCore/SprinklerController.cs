@@ -81,10 +81,10 @@ namespace SprinklerCore
                 if (cycleConfig.StartMinute < 0 || cycleConfig.StartMinute > 59)
                     throw new SprinklerControllerException("Minute must be 0-59");
 
-                var distinct = cycleConfig.ZoneConfigs.Distinct();
-                if (distinct.Count() != cycleConfig.ZoneConfigs.Count())
+                var distinct = cycleConfig.Zones.Distinct();
+                if (distinct.Count() != cycleConfig.Zones.Count())
                     throw new SprinklerControllerException("A zone can only be run once in each cylce");
-                foreach (var zoneTime in cycleConfig.ZoneConfigs)
+                foreach (var zoneTime in cycleConfig.Zones)
                 {
                     ValidateZone(zoneTime.ZoneNumber);
                     ValidateTime(zoneTime.RunTime);
