@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Threading;
+using Windows.System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.IO;
+using Windows.Storage;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 
 namespace SprinklerCore
 {
@@ -17,36 +16,44 @@ namespace SprinklerCore
         private Dictionary<int, ZoneController> _zoneControllers = new Dictionary<int, ZoneController>();
         private ZoneController _manualZone = null;
         private bool _done = false;
-        private Timer _timer = null;
+        private ThreadPoolTimer _timer = null;
 
-        private async Task ReadZoneConfig()
+        private async void ReadZoneConfig()
         {
-            // Server.MapPath("~/data.txt")
-            String serializedZones = await File.ReadAllTextAsync("ZoneConfig.json");
+            var packageFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            var zoneFile = await packageFolder.GetFileAsync("ZoneConfig.json");
+            String serializedZones = await FileIO.ReadTextAsync(zoneFile);
             _zoneControllers = JsonConvert.DeserializeObject<Dictionary<int,ZoneController>>(serializedZones);
         }
 
-        private async Task ReadPrograms()
+        private async void ReadPrograms()
         {
-            var serializedPrograms = await File.ReadAllTextAsync("Programs.json");
-            if (serializedPrograms != null)
+            var localFolder =  ApplicationData.Current.LocalFolder;
+            var programs = await localFolder.TryGetItemAsync("Programs.json");
+            if (programs != null)
             {
-                _programs = JsonConvert.DeserializeObject<List<Program>>(serializedPrograms);
-                foreach(var program in _programs)
-                    _cycles.AddRange(WateringCycle.ToWateringCycles(program));
+                var serializedPrograms = await FileIO.ReadTextAsync(programs as StorageFile);
+                if (serializedPrograms != null)
+                {
+                    _programs = JsonConvert.DeserializeObject<List<Program>>(serializedPrograms);
+                    foreach(var program in _programs)
+                        _cycles.AddRange(WateringCycle.ToWateringCycles(program));
+                }
             }
-            
         }
 
-        private void WritePrograms()
+        private async void WritePrograms()
         {
-            File.WriteAllText("Programs.json", JsonConvert.SerializeObject(_programs));
+            var localFolder = ApplicationData.Current.LocalFolder;
+            var programFile = await localFolder.CreateFileAsync("Programs.json",CreationCollisionOption.ReplaceExisting);
+            var serializedPrograms = JsonConvert.SerializeObject(_programs);
+            await FileIO.WriteTextAsync(programFile as StorageFile, serializedPrograms);
         }
 
         public SprinklerController()
         {
-            ReadZoneConfig().Wait();
-            ReadPrograms().Wait();
+            ReadZoneConfig();
+            ReadPrograms();
         }
 
         private void ValidateZone(int zone)
@@ -114,7 +121,7 @@ namespace SprinklerCore
             _manualZone = null;
         }
 
-        public async Task<Guid> AddProgram(Program programConfig)
+        public Guid AddProgram(Program programConfig)
         {
 
             ValidateCycleConfigs(programConfig.Cycles);
@@ -134,7 +141,7 @@ namespace SprinklerCore
             return programConfig.Id;
         }
 
-        public async Task<bool> DeleteProgram(Guid programId)
+        public bool DeleteProgram(Guid programId)
         {
             var response = false;
             lock (this)
@@ -195,17 +202,11 @@ namespace SprinklerCore
 
         public void RunScheduler()
         {
-            // _timer = ThreadPoolTimer.CreateTimer(Scheduler, TimeSpan.FromSeconds(1));
-            // trigger the timer immediately on startup
-            _timer = new Timer(Scheduler, null, 0, Timeout.Infinite);
-           
+           _timer = ThreadPoolTimer.CreateTimer(Scheduler, TimeSpan.FromSeconds(1));
         }
 
         private void Scheduler(object state)
         {
-            // Disable timer during processing
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
-
             if (!_done)
             {
                 var currentTime = DateTime.Now;
@@ -248,8 +249,7 @@ namespace SprinklerCore
                 }
                 if (!_done)
                 {
-                    // Convert from ThreadPoolTimer.CreateTimer
-                    _timer.Change(1000, Timeout.Infinite);
+                    _timer = ThreadPoolTimer.CreateTimer(Scheduler, TimeSpan.FromSeconds(1));
                 }
             }
         }
@@ -258,10 +258,7 @@ namespace SprinklerCore
         {
             _done = true;
             if (_timer != null)
-            {
-                _timer.Dispose();
-                _timer = null;
-            }
+                _timer.Cancel();
         }
 
     }
